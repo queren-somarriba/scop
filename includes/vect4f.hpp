@@ -4,8 +4,11 @@
 #include <iostream>
 #include <cmath>
 
+class mat4f;
+
 class alignas(16) vect4f
 {
+	friend class mat4f;
 	private:
 	union {
 		__m128	mm;

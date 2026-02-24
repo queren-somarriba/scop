@@ -157,6 +157,90 @@ class alignas(16) mat4f
 				vect4f(-s.dot(eye), -u.dot(eye), f.dot(eye), 1.0f)
 			);
 		}
+
+		inline mat4f inverse() const
+		{
+			//A = Sous-matrice 2x2 en haut gauche, B = haut droite, C = en bas gauche, D = bas à droite
+			__m128 A = _mm_shuffle_ps(cols[0].mm, cols[1].mm, _MM_SHUFFLE(1, 0, 1, 0));//[X0, Y0, X1, Y1]
+			__m128 B = _mm_shuffle_ps(cols[2].mm, cols[3].mm, _MM_SHUFFLE(1, 0, 1, 0));//[X2, Y2, X3, Y3]
+			__m128 C = _mm_shuffle_ps(cols[0].mm, cols[1].mm, _MM_SHUFFLE(3, 2, 3, 2));//[Z0, W0, Z1, W1]
+			__m128 D = _mm_shuffle_ps(cols[2].mm, cols[3].mm, _MM_SHUFFLE(3, 2, 3, 2));//[Z2, W2, Z3, W3]
+
+			//determinants blocs matrix 2x2
+			__m128 detSub = _mm_sub_ps(
+				_mm_mul_ps(_mm_shuffle_ps(cols[0].mm, cols[2].mm, _MM_SHUFFLE(2, 0, 2, 0)), _mm_shuffle_ps(cols[1].mm, cols[3].mm, _MM_SHUFFLE(3, 1, 3, 1))),
+				_mm_mul_ps(_mm_shuffle_ps(cols[0].mm, cols[2].mm, _MM_SHUFFLE(3, 1, 3, 1)), _mm_shuffle_ps(cols[1].mm, cols[3].mm, _MM_SHUFFLE(2, 0, 2, 0)))
+			);
+
+			//extract sub matrix determinants
+			__m128 detA_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(0, 0, 0, 0));
+			__m128 detB_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(2, 2, 2, 2));
+			__m128 detC_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(1, 1, 1, 1));
+			__m128 detD_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(3, 3, 3, 3));
+
+			//Adjointes intermédiaires D#C et A#B
+			__m128 D_C = _mm_sub_ps(
+				_mm_mul_ps(_mm_shuffle_ps(D, D, _MM_SHUFFLE(0, 3, 0, 3)), C),
+				_mm_mul_ps(_mm_shuffle_ps(D, D, _MM_SHUFFLE(1, 2, 1, 2)), _mm_shuffle_ps(C, C, _MM_SHUFFLE(2, 3, 0, 1)))
+			);
+			__m128 A_B = _mm_sub_ps(
+				_mm_mul_ps(_mm_shuffle_ps(A, A, _MM_SHUFFLE(0, 3, 0, 3)), B),
+				_mm_mul_ps(_mm_shuffle_ps(A, A, _MM_SHUFFLE(1, 2, 1, 2)), _mm_shuffle_ps(B, B, _MM_SHUFFLE(2, 3, 0, 1)))
+			);
+
+			// B.(D#C)
+			__m128 B_DC = _mm_add_ps(
+				_mm_mul_ps(_mm_shuffle_ps(B, B, _MM_SHUFFLE(1, 0, 1, 0)), _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(2, 2, 0, 0))),
+				_mm_mul_ps(_mm_shuffle_ps(B, B, _MM_SHUFFLE(3, 2, 3, 2)), _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(3, 3, 1, 1)))
+			);
+			__m128 X_ = _mm_sub_ps(_mm_mul_ps(detD_vec, A), B_DC);
+			//C.(A#B)
+			__m128 C_AB = _mm_add_ps(
+				_mm_mul_ps(_mm_shuffle_ps(C, C, _MM_SHUFFLE(1, 0, 1, 0)), _mm_shuffle_ps(A_B, A_B, _MM_SHUFFLE(2, 2, 0, 0))),
+				_mm_mul_ps(_mm_shuffle_ps(C, C, _MM_SHUFFLE(3, 2, 3, 2)), _mm_shuffle_ps(A_B, A_B, _MM_SHUFFLE(3, 3, 1, 1)))
+			);
+			__m128 W_ = _mm_sub_ps(_mm_mul_ps(detA_vec, D), C_AB);
+
+			//D.(A_B)#
+			__m128 D_AB = _mm_sub_ps(
+				_mm_mul_ps(D, _mm_shuffle_ps(A_B, A_B, _MM_SHUFFLE(0, 0, 3, 3))),
+				_mm_mul_ps(_mm_shuffle_ps(D, D, _MM_SHUFFLE(1, 0, 3, 2)), _mm_shuffle_ps(A_B, A_B, _MM_SHUFFLE(2, 2, 1, 1)))
+			);
+			__m128 Y_ = _mm_sub_ps(_mm_mul_ps(detB_vec, C), D_AB);
+			//A.(D_C)#
+			__m128 A_DC = _mm_sub_ps(
+				_mm_mul_ps(A, _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(0, 0, 3, 3))),
+				_mm_mul_ps(_mm_shuffle_ps(A, A, _MM_SHUFFLE(1, 0, 3, 2)), _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(2, 2, 1, 1)))
+			);
+			__m128 Z_ = _mm_sub_ps(_mm_mul_ps(detC_vec, B), A_DC);
+
+			//Trace
+			__m128 tr = _mm_mul_ps(A_B, _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(3, 1, 2, 0)));
+			tr = _mm_hadd_ps(tr, tr);//SSE3 : Somme horizontale
+			tr = _mm_hadd_ps(tr, tr);//_mm_hadd_ps(__m128 a, __m128 b) -> a0+a1 | a2+a3 | b0+b1 | b2+b3
+			
+			////detM = detA*detD + detB*detC - tr -- determinant global
+			__m128 detM = _mm_add_ps(_mm_mul_ps(detA_vec, detD_vec), _mm_mul_ps(detB_vec, detC_vec));
+			detM = _mm_sub_ps(detM, tr);
+
+			//rDetM = 1.0 / detM
+			const __m128 adjSignMask = _mm_setr_ps(1.f, -1.f, -1.f, 1.f);
+			__m128 rDetM = _mm_div_ps(adjSignMask, detM);
+
+			//multiplication des 4 blocs par l'inverse du déterminant
+			X_ = _mm_mul_ps(X_, rDetM);
+			Y_ = _mm_mul_ps(Y_, rDetM);
+			Z_ = _mm_mul_ps(Z_, rDetM);
+			W_ = _mm_mul_ps(W_, rDetM);
+
+			return mat4f(
+				_mm_shuffle_ps(X_, Z_, _MM_SHUFFLE(1, 3, 1, 3)),
+				_mm_shuffle_ps(X_, Z_, _MM_SHUFFLE(0, 2, 0, 2)),
+				_mm_shuffle_ps(Y_, W_, _MM_SHUFFLE(1, 3, 1, 3)),
+				_mm_shuffle_ps(Y_, W_, _MM_SHUFFLE(0, 2, 0, 2))
+			);
+		}
+
 };
 
 /* Stream insertion operator */
