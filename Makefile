@@ -6,7 +6,16 @@ INCLUDES_DIR = includes
 
 CFLAGS = -Wall -Werror -Wextra -g -I./$(INCLUDES_DIR)
 
-GLFLAGS = -lglut -lGLEW -lGLU -lGL
+OS := $(shell uname -s)
+
+ifeq ($(OS), Darwin)
+	GLFLAGS = -L/usr/local/lib \
+			-framework OpenGL \
+			-framework GLUT \
+			-lGLEW
+else
+	GLFLAGS = -lglut -lGLEW -lGLU -lGL
+endif
 
 SRCS_DIR = srcs
 
@@ -28,6 +37,7 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
+
 clean:
 	$(RM) $(OBJ_DIR)
 

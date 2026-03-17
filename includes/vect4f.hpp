@@ -9,13 +9,12 @@ class mat4f;
 class alignas(16) vect4f
 {
 	friend class mat4f;
-	private:
+	public:
 	union {
 		__m128	mm;
 		struct	{ float x, y, z, w;};
 		float	data[4];
 	};
-	public:
 		/* Constructors */
 			inline				vect4f() : mm(_mm_setzero_ps()) {}
 			inline				vect4f(vect4f const& rhs) = default;
