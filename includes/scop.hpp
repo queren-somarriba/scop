@@ -26,16 +26,15 @@ struct Material
 {
 	std::string name;
 
-	vect4f Ka{0.2f, 0.2f, 0.2f};
-	vect4f Kd{0.8f, 0.8f, 0.8f};
-	vect4f Ks{0.0f, 0.0f, 0.0f};
-	vect4f Ke{0.0f, 0.0f, 0.0f};
-
-	float Ns = 32.0f;
-	float Ni = 1.0f;
-	float d= 1.0f;
-	int illum = 2;
-
+	vect4f Ka{0.2f, 0.2f, 0.2f};	// ambient color (light reflected in shadow)
+	vect4f Kd{0.8f, 0.8f, 0.8f};	// diffuse color (main surface color)
+	vect4f Ks{0.0f, 0.0f, 0.0f};	// specular color (highlight color, black = no highlight)
+	vect4f Ke{0.0f, 0.0f, 0.0f};	// emissive color (self-illumination, black = no glow)
+	float Ns = 32.0f;		// specular exponent (shininess, higher = sharper highlight)
+	float Ni = 1.0f;		// index of refraction (1.0 = air/no refraction)
+	float d  = 1.0f;		// dissolve / opacity (1.0 = fully opaque)
+	int illum = 2;			// illumination model (2 = Phong: ambient + diffuse + specular)
+					// paths to associated texture maps
 	std::string map_Ka;
 	std::string map_Kd;
 	std::string map_Ks;
@@ -75,6 +74,8 @@ struct ObjModel
 	std::vector<Mesh> meshes;
 
 	std::unordered_map<std::string, Material> materials;
+
+	vect4f centroid{0.0f, 0.0f, 0.0f};
 };
 
 void parseMTL(const std::string& path,

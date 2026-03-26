@@ -215,5 +215,20 @@ ObjModel parseOBJ(const std::string& path)
 	[](const Mesh& m){ return m.faces.empty(); }),
 	model.meshes.end());
 
+	if (!model.positions.empty())
+	{
+		vect4f sum{0.0f, 0.0f, 0.0f};
+		for (const vect4f& p : model.positions)
+		{
+			sum.x += p.x;
+			sum.y += p.y;
+			sum.z += p.z;
+		}
+		float inv = 1.0f / static_cast<float>(model.positions.size());
+		model.centroid.x = sum.x * inv;
+		model.centroid.y = sum.y * inv;
+		model.centroid.z = sum.z * inv;
+	}
+
 	return model;
 }
