@@ -67,12 +67,10 @@ struct Mesh
 
 struct ObjModel
 {
-	std::vector<vect4f> positions;
-	std::vector<Vec2> uvs;
-	std::vector<vect4f> normals;
-
-	std::vector<Mesh> meshes;
-
+	std::vector<vect4f>	positions;
+	std::vector<Vec2>	uvs;
+	std::vector<vect4f>	normals;
+	std::vector<Mesh>	meshes;
 	std::unordered_map<std::string, Material> materials;
 
 	vect4f centroid{0.0f, 0.0f, 0.0f};
@@ -82,3 +80,10 @@ void parseMTL(const std::string& path,
 	std::unordered_map<std::string, Material>& materials);
 
 ObjModel parseOBJ(const std::string& path);
+
+struct	scopContext
+{
+	Shader			shaderProgram;
+	unsigned int	VBO;
+	unsigned int	VAO;
+};

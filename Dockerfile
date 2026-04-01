@@ -9,13 +9,13 @@ RUN apt-get update && apt-get install -y \
     libglew-dev \
     libglu1-mesa-dev \
     libgl1-mesa-dev \
+    libglfw3-dev \
     libx11-dev \
     libxrandr-dev \
     libxinerama-dev \
     libxcursor-dev \
     libxi-dev \
     mesa-utils \
-	freeglut3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

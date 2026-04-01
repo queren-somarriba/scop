@@ -4,28 +4,22 @@ CC = c++
 
 INCLUDES_DIR = includes
 
-CFLAGS = -Wall -Werror -Wextra -g -I./$(INCLUDES_DIR)
+CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -fsanitize=undefined -I./$(INCLUDES_DIR)
 
-OS := $(shell uname -s)
-
-ifeq ($(OS), Darwin)
-	GLFLAGS = -L/usr/local/lib \
-			-framework OpenGL \
-			-framework GLUT \
-			-lGLEW
-else
-	GLFLAGS = -lglut -lGLEW -lGLU -lGL
-endif
+GLFLAGS = -lGLEW -lglfw -lGL -lX11 -lpthread -ldl
 
 SRCS_DIR = srcs
 
-SRCS =	$(SRCS_DIR)/indexs.cpp
+SRCS =	$(SRCS_DIR)/main.cpp \
+		$(SRCS_DIR)/parser/pars.cpp
+		$(SRCS_DIR)/engine.cpp
 
 OBJ_DIR = obj
 
 OBJS = $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-$(OBJ_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRCS_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 RM = rm -rf

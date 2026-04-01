@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
 
 static std::string trim(const std::string& str)
 {
