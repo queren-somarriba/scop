@@ -53,7 +53,7 @@ class alignas(16) vect4f
 			float				dot(vect4f const &) const;
 			float				length() const;
 			float				lengthSq() const;
-			vect4f				normalized() const;
+			vect4f				normalize() const;
 			vect4f				cross(vect4f const &) const;
 };
 
@@ -117,7 +117,7 @@ inline float	vect4f::lengthSq() const
 }
 
 /* Newton-Raphson */
-inline vect4f	vect4f::normalized() const
+inline vect4f	vect4f::normalize() const
 {
 	__m128 va = _mm_set1_ps(dot(this->mm));
 	__m128 v0 = _mm_rsqrt_ps(va); 

@@ -1,16 +1,51 @@
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include "mat4f.hpp"
+#include "texture.hpp"
+#include "VAO.hpp"
+#include "engine.hpp"
+#include "camera.hpp"
 
-void framebuffer_size_callback (GLFWwindow* window, int width, int height)
-{
-	(void)window;
-	glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow * window)
+static void processInput(GLFWwindow *window, AppState& state)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(FORWARD, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(BACKWARD, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(LEFT, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(UP, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		state.camera.ProcessKeyboard(DOWN, state.deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !state.t_pressed)
+	{
+		state.showTexture = !state.showTexture;
+		state.t_pressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)
+		state.t_pressed = false;
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	(void)window;
+	(void)xoffset;
+	AppState* state = reinterpret_cast<AppState*>(glfwGetWindowUserPointer(window));
+	if (state)
+		state->camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	(void)window;
+	glViewport(0, 0, width, height);
 }
 
 GLFWwindow* initWindow()
@@ -24,128 +59,111 @@ GLFWwindow* initWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "scop", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "scop", NULL, NULL);
 	if (window == NULL)
 	{
-		std::cerr << "Failed to create GLFW window" << std::endl;
+		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
-		return -1;
+		return NULL;
 	}
 
 	glfwMakeContextCurrent(window);
-
-	glewExperimental=true;
-	GLenum res = glewInit();
-	if (res != GLEW_OK)
-	{
-		std::cerr << "Error: " << glewGetErrorString(res) << std::endl;
-		return NULL;
-	}
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	glClearColor(28.0 / 255.0, 28.0 / 255.0, 28.0 / 255.0, 1.0);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cerr << "Failed to initialize GLAD" << std::endl;
+		return (NULL);
+	}
+	
+	glEnable(GL_DEPTH_TEST);
 
 	return window;
 }
 
-void SetupBuffers(const ObjModel obj, GLuint& VAO, GLuint& VBO)
+void setTextureContext(scopData& data, AppState& state, float currentFrame)
 {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	mat4f view = state.camera.GetViewMatrix();
+	mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.f);
 
-	glBindVertexArray(VAO);
+	
+	mat4f model = mat4f::rotate(currentFrame, vect4f(0.f, 1.f, 0.f));
+	vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
+	vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
+	vect4f lightPos = state.camera.pos;
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, allSegments.size() * sizeof(vec2), allSegments.data(), GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	data.shaderTexture->use();
+	data.shaderTexture->setFloat("transition", state.transitionFactor);
+	data.shaderTexture->setVec4("viewPos", state.camera.pos);
+	data.shaderTexture->setMat4("model", model);
+	data.shaderTexture->setMat4("view", view);
+	data.shaderTexture->setMat4("projection", projection);
+	data.shaderTexture->setVec4("light.position", lightPos);
+	data.shaderTexture->setVec4("light.ambient", ambientColor);
+	data.shaderTexture->setVec4("light.diffuse", diffuseColor);
+	data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
 }
 
-GLuint CompileShaders()
+void setMeshContexteAndDraw(scopData& data)
 {
-	const char* pVSFileName = "shaders/shader.vs";
-	const char* pFSFileName = "shaders/shader.fs";
-
-	std::string vertexShaderSource = readFile(pVSFileName);
-	if (vertexShaderSource.empty())
-        {
-                std::cerr << "Error: Unable to read " << pVSFileName << std::endl;
-                return 0;
-        }
-
-	std::string fragmentShaderSource = readFile(pFSFileName);
-	if (fragmentShaderSource.empty())
-        {
-                std::cerr << "Error: Unable to read " << pVSFileName << std::endl;
-                return 0;
-        }
-
-	const char* fsh = fragmentShaderSource.c_str();
-	const char* vsh = vertexShaderSource.c_str();
-
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vsh, NULL);
-	glCompileShader(vertexShader);
-
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fsh, NULL);
-	glCompileShader(fragmentShader);
-
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	glUseProgram(shaderProgram); 
-
-	return shaderProgram;
-}
-
-void renderScene(GLFWwindow* window, renderContext& context, const otData& data)
-{
-	int currentWidth, currentHeight;
-	glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
-	glViewport(0, 0, currentWidth, currentHeight);
-
-	if (context.currentDrawCount < context.vertexCount)
+	data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
+	data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+	data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
+	data.shaderTexture->setFloat("material.shininess", 32.f);
+	for (const MeshDraw& md : data.meshDraws)
 	{
-		context.currentDrawCount += context.DrawSpeed;
-		if (context.currentDrawCount > context.vertexCount)
+		auto it = data.model.materials.find(md.material_name);
+		if (it != data.model.materials.end())
 		{
-			context.currentDrawCount = context.vertexCount;
-			if (context.isRecording && context.currentDrawCount >= context.vertexCount)
-				closeRecorder(context);
+			data.shaderTexture->setVec4("material.ambient", it->second.Ka);
+			data.shaderTexture->setVec4("material.diffuse", it->second.Kd);
+			data.shaderTexture->setVec4("material.specular", it->second.Ks);
+			data.shaderTexture->setFloat("material.shininess", it->second.Ns);
 		}
+		else
+		{
+			data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
+			data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+			data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
+			data.shaderTexture->setFloat("material.shininess", 32.f);
+		}
+		glDrawArrays(GL_TRIANGLES, md.offset, md.count);
+	}
+	
+}
+
+void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
+{
+	float currentFrame = static_cast<float>(glfwGetTime());
+	state.deltaTime = currentFrame - state.lastFrame;
+	state.lastFrame = currentFrame;
+	float target = state.showTexture ? 1.0f : 0.0f;
+
+	if (state.transitionFactor != target)
+	{
+		float step = 2.0f * state.deltaTime;
+		if (state.transitionFactor < target)
+			state.transitionFactor = std::min(state.transitionFactor + step, 1.0f);
+		else
+			state.transitionFactor = std::max(state.transitionFactor - step, 0.0f);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(context.shaderProgram);
+	processInput(window, state);
+	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	GLint u_resolutionLocaltion = glGetUniformLocation(context.shaderProgram, "u_resolution");
-	glUniform2f(u_resolutionLocaltion, static_cast<float>(data.width), static_cast<float>(data.height));
+	setTextureContext(data, state, currentFrame);
 
-	GLint u_angleLocation = glGetUniformLocation(context.shaderProgram, "u_angle");
-	glUniform1f(u_angleLocation, context.u_angle);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, data.texture->id);
 
-	glBindVertexArray(context.VAO);
-
-	glDrawArrays(GL_TRIANGLES, 0, context.currentDrawCount);
-
-	if (context.isRecording && context.ffmpegPipe)
-		record(context, currentWidth, currentHeight);
+	data.vao.bind();
+	setMeshContexteAndDraw(data);
+	data.vao.unbind();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

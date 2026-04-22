@@ -1,14 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <string.h>
-#include <fstream>
-#include <sstream>
-#include <math.h>
-
-//#include <OpenGL/freeglut.h>
-
-#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -16,7 +7,16 @@
 #include <stdexcept>
 #include "vect4f.hpp"
 #include "mat4f.hpp"
+#include "VAO.hpp"
+#include "VBO.hpp"
+#include "EBO.hpp"
+#include "shader.hpp"
+#include "texture.hpp"
+#include "camera.hpp"
+#include <memory>
 
+
+/* STRUCTURES */
 struct Vec2
 {
 	float x, y;
@@ -74,16 +74,50 @@ struct ObjModel
 	std::unordered_map<std::string, Material> materials;
 
 	vect4f centroid{0.0f, 0.0f, 0.0f};
+	float	radius = 1.f;
 };
 
-void parseMTL(const std::string& path,
-	std::unordered_map<std::string, Material>& materials);
-
-ObjModel parseOBJ(const std::string& path);
-
-struct	scopContext
+struct MeshDraw
 {
-	Shader			shaderProgram;
-	unsigned int	VBO;
-	unsigned int	VAO;
+	std::string	material_name;
+	int			offset;
+	int			count;
 };
+
+struct scopData
+{
+	ObjModel					model;
+	std::vector<MeshDraw>		meshDraws;
+	Material*					activeMaterial;
+	VAO							vao;
+	std::unique_ptr<VBO>		vbo;
+	std::unique_ptr<EBO>		ebo;
+	std::unique_ptr<Shader>		shaderTexture;
+	std::unique_ptr<Shader>		shaderLight;
+	std::unique_ptr<Texture>	texture;
+	int							vertexCount;
+};
+
+struct AppState
+{
+	Camera	camera;
+	float	deltaTime;
+	float	lastFrame;
+	float	transitionFactor;
+	bool	showTexture;
+	bool	t_pressed;
+	
+	AppState() : 
+		camera(vect4f(0.0f, 0.0f, 3.0f)), 
+		deltaTime(0.0f), lastFrame(0.0f),
+		transitionFactor(1.0f),
+		showTexture(true),
+		t_pressed(false) {}
+};
+
+
+/* FUNCTIONS */
+void		parseMTL(const std::string& path,
+				std::unordered_map<std::string, Material>& materials);
+
+ObjModel	parseOBJ(const std::string& path);

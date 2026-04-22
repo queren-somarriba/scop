@@ -90,25 +90,24 @@ class alignas(16) mat4f
 			return mat4f();
 		}
 
-		static inline mat4f translation(vect4f const& t)
+		static inline mat4f translate(vect4f const& t)
 		{
 			return mat4f(
 				vect4f(1.0f, 0.0f, 0.0f, 0.0f),
 				vect4f(0.0f, 1.0f, 0.0f, 0.0f),
 				vect4f(0.0f, 0.0f, 1.0f, 0.0f),
-				vect4f(t.getX(), t.getY(), t.getZ(), 1.0f) // Getters
+				vect4f(t.getX(), t.getY(), t.getZ(), 1.0f)
 			);
 		}
 
-		static inline mat4f rotation(float angle, vect4f const& axis)
+		static inline mat4f rotate(float angle, vect4f const& axis)
 		{
-			vect4f u = axis.normalized();
+			vect4f u = axis.normalize();
 
 			float c = std::cos(angle);
 			float s = std::sin(angle);
 			float t = 1.0f - c;
 
-			// Getters pour extraire les scalaires
 			float x = u.getX();
 			float y = u.getY();
 			float z = u.getZ();
@@ -146,8 +145,8 @@ class alignas(16) mat4f
 
 		static inline mat4f lookAt(vect4f const & eye, vect4f const & center, vect4f const & up)
 		{
-			vect4f f = (center - eye).normalized();
-			vect4f s = f.cross(up).normalized();
+			vect4f f = (center - eye).normalize();
+			vect4f s = f.cross(up).normalize();
 			vect4f u = s.cross(f);
 
 			return mat4f(
@@ -160,7 +159,6 @@ class alignas(16) mat4f
 
 		inline mat4f inverse() const
 		{
-			//A = Sous-matrice 2x2 en haut gauche, B = haut droite, C = en bas gauche, D = bas à droite
 			__m128 A = _mm_shuffle_ps(cols[0].mm, cols[1].mm, _MM_SHUFFLE(1, 0, 1, 0));//[X0, Y0, X1, Y1]
 			__m128 B = _mm_shuffle_ps(cols[2].mm, cols[3].mm, _MM_SHUFFLE(1, 0, 1, 0));//[X2, Y2, X3, Y3]
 			__m128 C = _mm_shuffle_ps(cols[0].mm, cols[1].mm, _MM_SHUFFLE(3, 2, 3, 2));//[Z0, W0, Z1, W1]
@@ -178,7 +176,7 @@ class alignas(16) mat4f
 			__m128 detC_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(1, 1, 1, 1));
 			__m128 detD_vec = _mm_shuffle_ps(detSub, detSub, _MM_SHUFFLE(3, 3, 3, 3));
 
-			//Adjointes intermédiaires D#C et A#B
+			//D#C et A#B
 			__m128 D_C = _mm_sub_ps(
 				_mm_mul_ps(_mm_shuffle_ps(D, D, _MM_SHUFFLE(0, 3, 0, 3)), C),
 				_mm_mul_ps(_mm_shuffle_ps(D, D, _MM_SHUFFLE(1, 2, 1, 2)), _mm_shuffle_ps(C, C, _MM_SHUFFLE(2, 3, 0, 1)))
@@ -216,7 +214,7 @@ class alignas(16) mat4f
 
 			//Trace
 			__m128 tr = _mm_mul_ps(A_B, _mm_shuffle_ps(D_C, D_C, _MM_SHUFFLE(3, 1, 2, 0)));
-			tr = _mm_hadd_ps(tr, tr);//SSE3 : Somme horizontale
+			tr = _mm_hadd_ps(tr, tr);
 			tr = _mm_hadd_ps(tr, tr);//_mm_hadd_ps(__m128 a, __m128 b) -> a0+a1 | a2+a3 | b0+b1 | b2+b3
 			
 			////detM = detA*detD + detB*detC - tr -- determinant global
@@ -227,7 +225,6 @@ class alignas(16) mat4f
 			const __m128 adjSignMask = _mm_setr_ps(1.f, -1.f, -1.f, 1.f);
 			__m128 rDetM = _mm_div_ps(adjSignMask, detM);
 
-			//multiplication des 4 blocs par l'inverse du déterminant
 			X_ = _mm_mul_ps(X_, rDetM);
 			Y_ = _mm_mul_ps(Y_, rDetM);
 			Z_ = _mm_mul_ps(Z_, rDetM);
