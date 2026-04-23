@@ -75,6 +75,7 @@ struct ObjModel
 
 	vect4f centroid{0.0f, 0.0f, 0.0f};
 	float	radius = 1.f;
+	int		modelVertexCount;
 };
 
 struct MeshDraw
@@ -110,9 +111,9 @@ struct AppState
 	AppState() : 
 		camera(vect4f(0.0f, 0.0f, 3.0f)), 
 		deltaTime(0.0f), lastFrame(0.0f),
-		transitionFactor(1.0f),
-		showTexture(true),
-		t_pressed(false) {}
+		transitionFactor(0.f),
+		showTexture(false),
+		t_pressed(true) {}
 };
 
 

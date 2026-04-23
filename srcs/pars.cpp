@@ -67,7 +67,7 @@ namespace
 		}
 	}
 
-	FaceVertex parseFaceVertex(const std::string& token)
+	FaceVertex parseFaceVertex(const std::string& token, int vertexCount)
 	{
 		FaceVertex fv;
 		std::istringstream ss(token);
@@ -78,6 +78,8 @@ namespace
 			if (!part.empty())
 			{
 				int idx = std::stoi(part) - 1;
+				if (idx < 0)
+					idx = vertexCount + idx;
 				if (slot == 0)
 					fv.pos_idx= idx;
 				if (slot == 1)
@@ -155,6 +157,7 @@ namespace
 			vect4f p{};
 			ss >> p.x >> p.y >> p.z;
 			model.positions.push_back(p);
+			++model.modelVertexCount;
 		}
 		else if (keyword == "vt")
 		{
@@ -212,7 +215,7 @@ namespace
 
 			std::string token;
 			while (ss >> token)
-				face.vertices.push_back(parseFaceVertex(token));
+				face.vertices.push_back(parseFaceVertex(token, model.modelVertexCount));
 
 			triangulateAndAddFace(face, *currentMesh);
 		}
