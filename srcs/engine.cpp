@@ -106,6 +106,11 @@ void setTextureContext(scopData& data, AppState& state, float currentFrame)
 	data.shaderTexture->setVec4("light.ambient", ambientColor);
 	data.shaderTexture->setVec4("light.diffuse", diffuseColor);
 	data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
+	data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
+	data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+	data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
+	data.shaderTexture->setFloat("illum.shininess", 32.f);
+	
 }
 
 void setMeshContexteAndDraw(scopData& data)
