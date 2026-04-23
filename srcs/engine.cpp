@@ -88,7 +88,8 @@ GLFWwindow* initWindow()
 void setTextureContext(scopData& data, AppState& state, float currentFrame)
 {
 	mat4f view = state.camera.GetViewMatrix();
-	mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.f);
+	mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
+													state.camera.pos.z + data.model.radius);
 
 	
 	mat4f model = mat4f::rotate(currentFrame, vect4f(0.f, 1.f, 0.f));

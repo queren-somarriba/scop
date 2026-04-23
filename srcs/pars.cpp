@@ -60,7 +60,7 @@ namespace
 			tri.material_name = face.material_name;
 			tri.vertices = {
 				face.vertices[0],
-				face.vertices[i],
+				face.vertices[i],//
 				face.vertices[i + 1]
 			};
 			mesh.faces.push_back(std::move(tri));

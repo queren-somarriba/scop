@@ -45,7 +45,7 @@ std::vector<float> flattenObjModel(const ObjModel& model, std::vector<MeshDraw>&
 				vertices.push_back(p.y - model.centroid.y);
 				vertices.push_back(p.z - model.centroid.z);
 
-				if (fv.normal_idx >= 0)
+				if (fv.normal_idx >= 0 && fv.normal_idx < (int)model.normals.size())
 				{
 					const vect4f& n = model.normals[fv.normal_idx];
 					vertices.push_back(n.x);
@@ -58,7 +58,7 @@ std::vector<float> flattenObjModel(const ObjModel& model, std::vector<MeshDraw>&
 					vertices.push_back(1.f);
 					vertices.push_back(0.f);
 				}
-				if (fv.uv_idx >= 0)
+				if (fv.uv_idx >= 0 && fv.uv_idx < (int)model.uvs.size())
 				{
 					vertices.push_back(model.uvs[fv.uv_idx].x);
 					vertices.push_back(model.uvs[fv.uv_idx].y);
