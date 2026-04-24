@@ -10,6 +10,7 @@ out vec3 FragPos;
 out vec3 FaceColor;
 out vec3 FragPosLocal;
 
+uniform float radius;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -17,7 +18,7 @@ uniform mat4 projection;
 
 void main()
 {
-	FragPosLocal = aPos;
+	FragPosLocal = aPos / radius;
 	FaceColor = aColor;
 
 	FragPos = vec3(model * vec4(aPos, 1.0));

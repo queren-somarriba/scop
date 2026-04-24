@@ -28,20 +28,10 @@ struct Material
 
 	vect4f Ka{0.2f, 0.2f, 0.2f};	// ambient color (light reflected in shadow)
 	vect4f Kd{0.8f, 0.8f, 0.8f};	// diffuse color (main surface color)
-	vect4f Ks{0.0f, 0.0f, 0.0f};	// specular color (highlight color, black = no highlight)
-	vect4f Ke{0.0f, 0.0f, 0.0f};	// emissive color (self-illumination, black = no glow)
-	float Ns = 32.0f;		// specular exponent (shininess, higher = sharper highlight)
-	float Ni = 1.0f;		// index of refraction (1.0 = air/no refraction)
-	float d  = 1.0f;		// dissolve / opacity (1.0 = fully opaque)
+	vect4f Ks{0.f, 0.f, 0.f};	// specular color (highlight color, black = no highlight)
+	vect4f Ke{0.f, 0.f, 0.f};	// emissive color (self-illumination, black = no glow)
+	float Ns = 32.f;		// specular exponent (shininess, higher = sharper highlight)
 	int illum = 2;			// illumination model (2 = Phong: ambient + diffuse + specular)
-					// paths to associated texture maps
-	std::string map_Ka;
-	std::string map_Kd;
-	std::string map_Ks;
-	std::string map_Ke;
-	std::string map_Ns;
-	std::string map_d;
-	std::string map_bump;
 };
 
 
@@ -105,6 +95,7 @@ struct AppState
 	float	deltaTime;
 	float	lastFrame;
 	float	transitionFactor;
+	float	movementSpeed;
 	bool	showTexture;
 	bool	t_pressed;
 	

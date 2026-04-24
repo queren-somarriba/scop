@@ -101,8 +101,13 @@ void main()
 	vec3 lightDir = normalize(vec3(light.position) - FragPos);
 	vec3 viewDir = normalize(vec3(viewPos) - FragPos);
 
-	vec3 colorResult = ComputePhong(vec3(FaceColor), norm, lightDir, viewDir);
-	vec3 textureResult = ComputePhong(triPlanarColor, norm, lightDir, viewDir);    
+	vec3 colorResult0 = ComputePhong(vec3(FaceColor), norm, lightDir, viewDir);
+	vec3 otherSideColor = ComputePhong(vec3(FaceColor), -norm, lightDir, viewDir);
+	vec3 textureResult0 = ComputePhong(triPlanarColor, norm, lightDir, viewDir); 
+	vec3 otherSideTexture = ComputePhong(triPlanarColor, -norm, lightDir, viewDir);  
+
+	vec3 colorResult = colorResult0 + otherSideColor;
+	vec3 textureResult = textureResult0 + otherSideTexture;
 
 	vec3 final = mix(colorResult, textureResult, transition);
 	FragColor = vec4(final, 1.0);

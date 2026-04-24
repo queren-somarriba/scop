@@ -13,17 +13,17 @@ static void processInput(GLFWwindow *window, AppState& state)
 		glfwSetWindowShouldClose(window, true);
 	
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(FORWARD, state.deltaTime);
+		state.camera.ProcessKeyboard(FORWARD, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(BACKWARD, state.deltaTime);
+		state.camera.ProcessKeyboard(BACKWARD, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(LEFT, state.deltaTime);
+		state.camera.ProcessKeyboard(LEFT, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(RIGHT, state.deltaTime);
+		state.camera.ProcessKeyboard(RIGHT, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(UP, state.deltaTime);
+		state.camera.ProcessKeyboard(UP, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(DOWN, state.deltaTime);
+		state.camera.ProcessKeyboard(DOWN, state.movementSpeed);
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !state.t_pressed)
 	{
 		state.showTexture = !state.showTexture;
@@ -39,7 +39,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	(void)xoffset;
 	AppState* state = reinterpret_cast<AppState*>(glfwGetWindowUserPointer(window));
 	if (state)
-		state->camera.ProcessMouseScroll(static_cast<float>(yoffset));
+		state->camera.ProcessMouseScroll(static_cast<float>(yoffset) * state->movementSpeed);
 }
 
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -98,6 +98,7 @@ void setTextureContext(scopData& data, AppState& state, float currentFrame)
 	vect4f lightPos = state.camera.pos;
 
 	data.shaderTexture->use();
+	data.shaderTexture->setFloat("radius", data.model.radius);
 	data.shaderTexture->setFloat("transition", state.transitionFactor);
 	data.shaderTexture->setVec4("viewPos", state.camera.pos);
 	data.shaderTexture->setMat4("model", model);
@@ -116,10 +117,6 @@ void setTextureContext(scopData& data, AppState& state, float currentFrame)
 
 void setMeshContexteAndDraw(scopData& data)
 {
-	data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
-	data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
-	data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
-	data.shaderTexture->setFloat("material.shininess", 32.f);
 	for (const MeshDraw& md : data.meshDraws)
 	{
 		auto it = data.model.materials.find(md.material_name);
@@ -148,6 +145,7 @@ void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 	state.deltaTime = currentFrame - state.lastFrame;
 	state.lastFrame = currentFrame;
 	float target = state.showTexture ? 1.0f : 0.0f;
+	state.movementSpeed = data.model.radius * state.deltaTime;
 
 	if (state.transitionFactor != target)
 	{

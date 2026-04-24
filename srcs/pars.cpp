@@ -114,31 +114,8 @@ namespace
 			ss >> current->Ke.x >> current->Ke.y >> current->Ke.z;
 		else if (current && keyword == "Ns")
 			ss >> current->Ns;
-		else if (current && keyword == "Ni")
-			ss >> current->Ni;
-		else if (current && keyword == "d")
-			ss >> current->d;
-		else if (current && keyword == "Tr")
-		{
-			ss >> current->d;
-			current->d = 1.0f - current->d;
-		}
 		else if (current && keyword == "illum")
 			ss >> current->illum;
-		else if (current && keyword == "map_Ka")
-			ss >> current->map_Ka;
-		else if (current && keyword == "map_Kd")
-			ss >> current->map_Kd;
-		else if (current && keyword == "map_Ks")
-			ss >> current->map_Ks;
-		else if (current && keyword == "map_Ke")
-			ss >> current->map_Ke;
-		else if (current && keyword == "map_Ns")
-			ss >> current->map_Ns;
-		else if (current && keyword == "map_d")
-			ss >> current->map_d;
-		else if (current && (keyword == "map_bump" || keyword == "bump"|| keyword == "norm"))
-			ss >> current->map_bump;
 	}
 
 	void assignOBJValue(std::string& line, ObjModel& model, std::string& currentMaterial,
