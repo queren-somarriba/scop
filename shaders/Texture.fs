@@ -94,21 +94,15 @@ void main()
 	vec3 fdx = dFdx(FragPosLocal);
 	vec3 fdy = dFdy(FragPosLocal);
 	vec3 faceNormal = normalize(cross(fdx, fdy));
-	vec3 norm = normalize(Normal);
+	vec3 norm = gl_FrontFacing ? normalize(Normal) : -normalize(Normal);
 
 	vec3 triPlanarColor = GetTriPlanarTexture(faceNormal);
+	vec3 mixColor = mix(triPlanarColor, FaceColor, transition);
 
 	vec3 lightDir = normalize(vec3(light.position) - FragPos);
 	vec3 viewDir = normalize(vec3(viewPos) - FragPos);
 
-	vec3 colorResult0 = ComputePhong(vec3(FaceColor), norm, lightDir, viewDir);
-	vec3 otherSideColor = ComputePhong(vec3(FaceColor), -norm, lightDir, viewDir);
-	vec3 textureResult0 = ComputePhong(triPlanarColor, norm, lightDir, viewDir); 
-	vec3 otherSideTexture = ComputePhong(triPlanarColor, -norm, lightDir, viewDir);  
+	vec3 final = ComputePhong(mixColor, norm, lightDir, viewDir);
 
-	vec3 colorResult = colorResult0 + otherSideColor;
-	vec3 textureResult = textureResult0 + otherSideTexture;
-
-	vec3 final = mix(colorResult, textureResult, transition);
 	FragColor = vec4(final, 1.0);
 }
