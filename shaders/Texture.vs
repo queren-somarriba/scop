@@ -18,7 +18,7 @@ uniform mat4 projection;
 
 void main()
 {
-	FragPosLocal = aPos / radius;
+	FragPosLocal = aPos / radius * 2.0;
 	FaceColor = aColor;
 
 	FragPos = vec3(model * vec4(aPos, 1.0));
@@ -27,5 +27,5 @@ void main()
 
 	gl_Position = projection * view * vec4(FragPos, 1.0);
 
-	TexCoord = aTexCoord;
+	TexCoord = aTexCoord / radius;
 }

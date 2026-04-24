@@ -86,7 +86,7 @@ vec3 ComputePhong(vec3 baseColor, vec3 norm, vec3 lightDir, vec3 viewDir)
 	vec3 MatPhong = MatAmbient + MatDiffuse + MatSpecular;
 	vec3 Phong = Ambient + Diffuse + Specular;
 
-	return mix(Phong, MatPhong, transition);
+	return mix(MatPhong, Phong, transition);
 }
 
 void main()
