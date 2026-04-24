@@ -1,5 +1,8 @@
 #include "shader.hpp"
 #include "mat4f.hpp"
+#include <fstream>
+#include <sstream>
+
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {

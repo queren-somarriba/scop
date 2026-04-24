@@ -2,9 +2,6 @@
 
 #include <glad/glad.h>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include "mat4f.hpp"
 
 class Shader

@@ -3,49 +3,72 @@
 #include <iostream>
 #include "mat4f.hpp"
 #include "texture.hpp"
-#include "VAO.hpp"
 #include "engine.hpp"
 #include "camera.hpp"
+#include "callback.hpp"
 
-static void processInput(GLFWwindow *window, AppState& state)
+namespace
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-	
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(FORWARD, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(BACKWARD, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(LEFT, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(RIGHT, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(UP, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		state.camera.ProcessKeyboard(DOWN, state.movementSpeed);
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !state.t_pressed)
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
-		state.showTexture = !state.showTexture;
-		state.t_pressed = true;
+		(void)window;
+		glViewport(0, 0, width, height);
 	}
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)
-		state.t_pressed = false;
-}
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	(void)window;
-	(void)xoffset;
-	AppState* state = reinterpret_cast<AppState*>(glfwGetWindowUserPointer(window));
-	if (state)
-		state->camera.ProcessMouseScroll(static_cast<float>(yoffset) * state->movementSpeed);
-}
+	void setTextureContext(scopData& data, AppState& state)
+	{
+		mat4f view = state.camera.GetViewMatrix();
+		mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
+														state.camera.pos.z + data.model.radius);
 
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	(void)window;
-	glViewport(0, 0, width, height);
+		mat4f model = mat4f::rotate(state.angleX, vect4f(1.f, 0.f, 0.f));
+		model = model * mat4f::rotate(state.angleY, vect4f(0.f, 1.f, 0.f));
+		model = model * mat4f::rotate(state.angleZ, vect4f(0.f, 0.f, 1.f));
+		vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
+		vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
+		vect4f lightPos = state.camera.pos;
+
+		data.shaderTexture->use();
+		data.shaderTexture->setFloat("radius", data.model.radius);
+		data.shaderTexture->setFloat("transition", state.transitionFactor);
+		data.shaderTexture->setVec4("viewPos", state.camera.pos);
+		data.shaderTexture->setMat4("model", model);
+		data.shaderTexture->setMat4("view", view);
+		data.shaderTexture->setMat4("projection", projection);
+		data.shaderTexture->setVec4("light.position", lightPos);
+		data.shaderTexture->setVec4("light.ambient", ambientColor);
+		data.shaderTexture->setVec4("light.diffuse", diffuseColor);
+		data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
+		data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
+		data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+		data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
+		data.shaderTexture->setFloat("illum.shininess", 32.f);
+		
+	}
+
+	void setMeshContexteAndDraw(scopData& data)
+	{
+		for (const MeshDraw& md : data.meshDraws)
+		{
+			auto it = data.model.materials.find(md.material_name);
+			if (it != data.model.materials.end())
+			{
+				data.shaderTexture->setVec4("material.ambient", it->second.Ka);
+				data.shaderTexture->setVec4("material.diffuse", it->second.Kd);
+				data.shaderTexture->setVec4("material.specular", it->second.Ks);
+				data.shaderTexture->setFloat("material.shininess", it->second.Ns);
+			}
+			else
+			{
+				data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
+				data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+				data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
+				data.shaderTexture->setFloat("material.shininess", 32.f);
+			}
+			glDrawArrays(GL_TRIANGLES, md.offset, md.count);
+		}
+		
+	}
 }
 
 GLFWwindow* initWindow()
@@ -85,67 +108,17 @@ GLFWwindow* initWindow()
 	return window;
 }
 
-void setTextureContext(scopData& data, AppState& state, float currentFrame)
-{
-	mat4f view = state.camera.GetViewMatrix();
-	mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
-													state.camera.pos.z + data.model.radius);
-
-	
-	mat4f model = mat4f::rotate(currentFrame, vect4f(0.f, 1.f, 0.f));
-	vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
-	vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
-	vect4f lightPos = state.camera.pos;
-
-	data.shaderTexture->use();
-	data.shaderTexture->setFloat("radius", data.model.radius);
-	data.shaderTexture->setFloat("transition", state.transitionFactor);
-	data.shaderTexture->setVec4("viewPos", state.camera.pos);
-	data.shaderTexture->setMat4("model", model);
-	data.shaderTexture->setMat4("view", view);
-	data.shaderTexture->setMat4("projection", projection);
-	data.shaderTexture->setVec4("light.position", lightPos);
-	data.shaderTexture->setVec4("light.ambient", ambientColor);
-	data.shaderTexture->setVec4("light.diffuse", diffuseColor);
-	data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
-	data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
-	data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
-	data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
-	data.shaderTexture->setFloat("illum.shininess", 32.f);
-	
-}
-
-void setMeshContexteAndDraw(scopData& data)
-{
-	for (const MeshDraw& md : data.meshDraws)
-	{
-		auto it = data.model.materials.find(md.material_name);
-		if (it != data.model.materials.end())
-		{
-			data.shaderTexture->setVec4("material.ambient", it->second.Ka);
-			data.shaderTexture->setVec4("material.diffuse", it->second.Kd);
-			data.shaderTexture->setVec4("material.specular", it->second.Ks);
-			data.shaderTexture->setFloat("material.shininess", it->second.Ns);
-		}
-		else
-		{
-			data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
-			data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
-			data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
-			data.shaderTexture->setFloat("material.shininess", 32.f);
-		}
-		glDrawArrays(GL_TRIANGLES, md.offset, md.count);
-	}
-	
-}
-
 void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 {
 	float currentFrame = static_cast<float>(glfwGetTime());
 	state.deltaTime = currentFrame - state.lastFrame;
 	state.lastFrame = currentFrame;
 	float target = state.showTexture ? 1.0f : 0.0f;
-	state.movementSpeed = data.model.radius * state.deltaTime;
+	state.movementSpeed = data.model.radius * state.deltaTime * 0.5f;
+	if (state.isRotatingY)
+		state.angleY += state.deltaTime;
+	if (state.angleY >= 2.f * M_PI)
+		state.angleY = 0.f;
 
 	if (state.transitionFactor != target)
 	{
@@ -160,7 +133,7 @@ void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	setTextureContext(data, state, currentFrame);
+	setTextureContext(data, state);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, data.texture->id);

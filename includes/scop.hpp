@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <array>
 #include <stdexcept>
-#include "vect4f.hpp"
 #include "mat4f.hpp"
 #include "VAO.hpp"
 #include "VBO.hpp"
@@ -50,19 +49,18 @@ struct Face
 
 struct Mesh
 {
+	std::vector<Face> faces;
 	std::string name;
 	std::string material_name;
-	std::vector<Face> faces;
 };
 
 struct ObjModel
 {
-	std::vector<vect4f>	positions;
-	std::vector<Vec2>	uvs;
-	std::vector<vect4f>	normals;
-	std::vector<Mesh>	meshes;
 	std::unordered_map<std::string, Material> materials;
-
+	std::vector<Mesh>	meshes;
+	std::vector<vect4f>	positions;
+	std::vector<vect4f>	normals;
+	std::vector<Vec2>	uvs;
 	vect4f centroid{0.0f, 0.0f, 0.0f};
 	float	radius = 1.f;
 	int		modelVertexCount;
@@ -96,15 +94,25 @@ struct AppState
 	float	lastFrame;
 	float	transitionFactor;
 	float	movementSpeed;
+	float	angleX = 0.f;
+	float	angleY = 0.f;
+	float	angleZ = 0.f;
+	bool	isRotatingY;
 	bool	showTexture;
 	bool	t_pressed;
+	bool	x_pressed;
+	bool	z_pressed;
+	bool	space_pressed;
 	
 	AppState() : 
 		camera(vect4f(0.0f, 0.0f, 3.0f)), 
 		deltaTime(0.0f), lastFrame(0.0f),
-		transitionFactor(0.f),
-		showTexture(false),
-		t_pressed(true) {}
+		transitionFactor(1.f),
+		angleX(0.f), angleY(0.f), angleZ(0.f),
+		isRotatingY(true),
+		showTexture(true),
+		t_pressed(false), x_pressed(false), 
+		z_pressed(false), space_pressed(false) {}
 };
 
 

@@ -37,7 +37,9 @@ SRCS		= $(SRCS_DIR)/main.cpp \
 			$(CLASS_CPP)/shader.cpp \
 			$(CLASS_CPP)/texture.cpp \
 			$(CLASS_CPP)/camera.cpp \
-			$(SRCS_DIR)/utils.cpp
+			$(SRCS_DIR)/utils.cpp \
+			$(SRCS_DIR)/callback.cpp \
+			$(SRCS_DIR)/data.cpp
 
 OBJS		= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 #include "mat4f.hpp"
-#include <cmath>
 
 enum Camera_Movement
 {

@@ -1,5 +1,6 @@
 #include "texture.hpp"
 #include <cstdint>
+#include <fstream>
 
 
 Texture::Texture(const char* img_path,	GLenum slot) : id(0), slot(slot)

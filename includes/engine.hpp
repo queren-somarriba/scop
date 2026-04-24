@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include "scop.hpp"
 
 constexpr unsigned int SCR_WIDTH = 800;
