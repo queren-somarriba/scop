@@ -1,0 +1,9 @@
+newmtl None
+	Ns 100.0000
+	illum 2
+	Ka 0.2000 0.2000 0.2000
+	Kd 0.8000 0.8000 0.8000
+	Ks 1.0000 1.0000 1.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka assets/vg2.bmp
+	map_Kd assets/vg2.bmp

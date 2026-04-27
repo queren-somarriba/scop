@@ -1,0 +1,39 @@
+newmtl eye
+	Ns 50.0000
+	illum 2
+	Ka 10.0000 10.0000 10.0000
+	Kd 0.8000 0.8000 0.8000
+	Ks 1.0000 1.0000 1.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka assets/vas2.bmp
+	map_Kd assets/vas2.bmp
+
+newmtl eye2
+	Ns 100.0000
+	illum 2
+	Ka 10.0000 0.0000 0.0000
+	Kd 0.8000 0.0000 0.0000
+	Ks 0.0000 1.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka assets/vas2.bmp
+	map_Kd assets/vas2.bmp
+
+newmtl eye3
+	Ns 50.0000
+	illum 2
+	Ka 0.0000 0.0000 0.2000
+	Kd 0.0000 0.0000 0.2000
+	Ks 1.0000 1.0000 1.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka assets/vas2.bmp
+	map_Kd assets/vas2.bmp
+
+newmtl eye4
+	Ns 50.0000
+	illum 2
+	Ka 0.0000 0.0000 0.2000
+	Kd 0.8000 0.8000 0.8000
+	Ks 1.0000 1.0000 1.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka assets/vas2.bmp
+	map_Kd assets/vas2.bmp

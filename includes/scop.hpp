@@ -31,6 +31,7 @@ struct Material
 	vect4f Ke{0.f, 0.f, 0.f};	// emissive color (self-illumination, black = no glow)
 	float Ns = 32.f;		// specular exponent (shininess, higher = sharper highlight)
 	int illum = 2;			// illumination model (2 = Phong: ambient + diffuse + specular)
+	std::unique_ptr<Texture>	texture;
 };
 
 
@@ -83,7 +84,7 @@ struct scopData
 	std::unique_ptr<EBO>		ebo;
 	std::unique_ptr<Shader>		shaderTexture;
 	std::unique_ptr<Shader>		shaderLight;
-	std::unique_ptr<Texture>	texture;
+	//std::unique_ptr<Texture>	texture;
 	int							vertexCount;
 };
 
@@ -97,6 +98,7 @@ struct AppState
 	float	angleX = 0.f;
 	float	angleY = 0.f;
 	float	angleZ = 0.f;
+	size_t	fpsCounter;
 	bool	isRotatingY;
 	bool	showTexture;
 	bool	t_pressed;

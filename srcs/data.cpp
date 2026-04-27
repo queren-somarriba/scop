@@ -163,6 +163,6 @@ void setupData(scopData& data, AppState& state, const std::string& objPath)
 
 	setupVertex(data, vertices);
 
-	data.texture = std::make_unique<Texture>("resources/assets/mou1.bmp");
+	//data.texture = std::make_unique<Texture>("resources/assets/vg2.bmp");
 	data.shaderTexture = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
 }

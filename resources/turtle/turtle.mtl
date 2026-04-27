@@ -12,5 +12,5 @@ newmtl 13103_pearlturtle_body
 	Kd 1.0000 1.0000 1.0000
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka turtle.bmp.jpg
-	map_Kd turtle.bmp.jpg
+	map_Ka turtle/turtle.bmp
+	map_Kd turtle/turtle.bmp

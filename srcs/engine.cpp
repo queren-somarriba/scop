@@ -82,6 +82,7 @@ GLFWwindow* initWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "scop", NULL, NULL);
 	if (window == NULL)
@@ -104,6 +105,7 @@ GLFWwindow* initWindow()
 	}
 	
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	return window;
 }
@@ -113,6 +115,15 @@ void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 	float currentFrame = static_cast<float>(glfwGetTime());
 	state.deltaTime = currentFrame - state.lastFrame;
 	state.lastFrame = currentFrame;
+	++state.fpsCounter;
+	if (state.deltaTime >= 1.f / 30.f)
+	{
+		std::string FPS = std::to_string((1.f / state.deltaTime) * static_cast<float>(state.fpsCounter));
+		std:: string ms = std::to_string((state.deltaTime / static_cast<float>(state.fpsCounter)) * 1000.f);
+		std::string newTitle = "scop - " + FPS + " fps / " + ms + " ms";
+		glfwSetWindowTitle(window, newTitle.c_str());
+		state.fpsCounter = 0;
+	}
 	float target = state.showTexture ? 1.0f : 0.0f;
 	state.movementSpeed = data.model.radius * state.deltaTime * 0.5f;
 	if (state.isRotatingY)
@@ -136,7 +147,8 @@ void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 	setTextureContext(data, state);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, data.texture->id);
+	if (data.activeMaterial)
+		glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
 
 	data.vao.bind();
 	setMeshContexteAndDraw(data);
