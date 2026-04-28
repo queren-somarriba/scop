@@ -93,6 +93,7 @@ struct AppState
 	Camera	camera;
 	float	deltaTime;
 	float	lastFrame;
+	float	second;
 	float	transitionFactor;
 	float	movementSpeed;
 	float	angleX = 0.f;

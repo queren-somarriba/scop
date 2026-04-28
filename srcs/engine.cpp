@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "mat4f.hpp"
 #include "texture.hpp"
 #include "engine.hpp"
@@ -115,14 +117,20 @@ void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 	float currentFrame = static_cast<float>(glfwGetTime());
 	state.deltaTime = currentFrame - state.lastFrame;
 	state.lastFrame = currentFrame;
+	state.second += state.deltaTime;
 	++state.fpsCounter;
-	if (state.deltaTime >= 1.f / 30.f)
+	if (state.second >= 1.f)
 	{
-		std::string FPS = std::to_string((1.f / state.deltaTime) * static_cast<float>(state.fpsCounter));
-		std:: string ms = std::to_string((state.deltaTime / static_cast<float>(state.fpsCounter)) * 1000.f);
-		std::string newTitle = "scop - " + FPS + " fps / " + ms + " ms";
-		glfwSetWindowTitle(window, newTitle.c_str());
+		float fps = static_cast<float>(state.fpsCounter) / state.second;
+		// std::string FPS = std::to_string(fps);
+		// std:: string ms = std::to_string(1000.f / fps);
+		// std::string newTitle = "scop - " + FPS + " fps / " + ms + " ms";
+		std::stringstream ss;
+		ss << "scop - " << std::fixed << std::setprecision(0) << fps;
+		ss << " fps / " << std::fixed << std::setprecision(1) << 1000.f / fps << " ms";
+		glfwSetWindowTitle(window, ss.str().c_str());
 		state.fpsCounter = 0;
+		state.second = 0;
 	}
 	float target = state.showTexture ? 1.0f : 0.0f;
 	state.movementSpeed = data.model.radius * state.deltaTime * 0.5f;
