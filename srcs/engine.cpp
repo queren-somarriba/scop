@@ -155,15 +155,20 @@ void renderOBJ(GLFWwindow* window, scopData& data)
 
 	setTextureContext(data);
 
-	glActiveTexture(GL_TEXTURE0);
-	if (data.activeMaterial && data.activeMaterial->texture)
-		glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
-	else
-	{
-		Texture default_texture("resources/assets/mou2.bmp");
-		if (default_texture.id)
-			glBindTexture(GL_TEXTURE_2D, default_texture.id);
-	}
+	// glActiveTexture(GL_TEXTURE0);
+	// if (data.activeMaterial && data.activeMaterial->texture)
+	// {
+	// 	std::cout << "mat: " << data.activeMaterial->name << std::endl;
+	// 	glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
+	// }
+	// else
+	// {
+	// 	std::cout << "defmat" << std::endl;
+	// 	Texture default_texture("./resources/assets/mou2.bmp");
+	// 	std::cout << "id= " << default_texture.id << std::endl;
+	// 	if (default_texture.id)
+	// 		glBindTexture(GL_TEXTURE_2D, default_texture.id);
+	// }
 
 	data.vao.bind();
 	setMeshContexteAndDraw(data);

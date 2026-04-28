@@ -32,6 +32,21 @@ int main(int argc, char** argv)
 			
 			glfwSetWindowUserPointer(window, &data);
 
+
+			// glActiveTexture(GL_TEXTURE0);
+			// if (data.activeMaterial && data.activeMaterial->texture)
+			// {
+			// 	std::cout << "mat: " << data.activeMaterial->name << std::endl;
+			// 	glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
+			// }
+			// else
+			// {
+			// 	std::cout << "defmat" << std::endl;
+			// 	Texture default_texture("./resources/assets/mou2.bmp");
+			// 	std::cout << "id= " << default_texture.id << std::endl;
+			// 	if (default_texture.id)
+			// 		glBindTexture(GL_TEXTURE_2D, default_texture.id);
+			// }
 			while (!glfwWindowShouldClose(window))
 				renderOBJ(window, data);
 		}
