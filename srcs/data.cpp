@@ -158,6 +158,8 @@ void setupData(scopData& data, AppState& state, const std::string& objPath)
 	state.camera.pos = vect4f(0.f, 0.f, distance);
 	std::vector<float> vertices = flattenObjModel(data.model, data.meshDraws);
 	data.vertexCount = static_cast<int>(vertices.size() / 11);
+	state.trunc *= data.model.radius;
+	state.modelRadius = data.model.radius;
 
 	activateMaterial(data);
 

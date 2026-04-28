@@ -51,6 +51,10 @@ void processInput(GLFWwindow *window, AppState& state)
 	InputMoveCam(window, state);
 	InputRotateModel(window, state);
 
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		state.trunc += 0.01f * state.modelRadius;
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		state.trunc -= 0.01f * state.modelRadius;
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !state.space_pressed)
 	{
 		state.isRotatingY = !state.isRotatingY;
@@ -67,7 +71,21 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	(void)window;
 	(void)xoffset;
-	AppState* state = reinterpret_cast<AppState*>(glfwGetWindowUserPointer(window));
-	if (state)
-		state->camera.ProcessMouseScroll(static_cast<float>(yoffset) * state->movementSpeed);
+	scopData* data = reinterpret_cast<scopData*>(glfwGetWindowUserPointer(window));
+	if (data && data->activeMaterial)
+		data->activeMaterial->Ns += static_cast<float>(yoffset);
 }
+
+// void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+// {
+// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+// 	{
+// 		glfwGetCursorPos(window, &xpos, &ypos);
+// 		std::cout << "startX= " << xpos << ", startY= " << ypos << std::endl;
+// 	}
+// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+// 	{
+// 		glfwGetCursorPos(window, &xpos, &ypos);
+// 		std::cout << "endX= " << xpos << ", endY= " << ypos << std::endl;
+// 	}
+// }

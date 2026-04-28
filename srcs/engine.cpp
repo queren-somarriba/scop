@@ -31,6 +31,7 @@ namespace
 		vect4f lightPos = state.camera.pos;
 
 		data.shaderTexture->use();
+		data.shaderTexture->setFloat("Ztrunc", state.trunc);
 		data.shaderTexture->setFloat("radius", data.model.radius);
 		data.shaderTexture->setFloat("transition", state.transitionFactor);
 		data.shaderTexture->setVec4("viewPos", state.camera.pos);
@@ -69,7 +70,40 @@ namespace
 			}
 			glDrawArrays(GL_TRIANGLES, md.offset, md.count);
 		}
-		
+	}
+
+	void updateAppState(GLFWwindow* window, AppState& state, float radius)
+	{
+		float currentFrame = static_cast<float>(glfwGetTime());
+		state.deltaTime = currentFrame - state.lastFrame;
+		state.lastFrame = currentFrame;
+		state.second += state.deltaTime;
+		++state.fpsCounter;
+		if (state.second >= 1.f)
+		{
+			float fps = static_cast<float>(state.fpsCounter) / state.second;
+			std::stringstream ss;
+			ss << "scop - " << std::fixed << std::setprecision(0) << fps;
+			ss << " fps / " << std::fixed << std::setprecision(1) << 1000.f / fps << " ms";
+			glfwSetWindowTitle(window, ss.str().c_str());
+			state.fpsCounter = 0;
+			state.second = 0;
+		}
+		float target = state.showTexture ? 1.0f : 0.0f;
+		state.movementSpeed = radius * state.deltaTime * 0.5f;
+		if (state.isRotatingY)
+			state.angleY += state.deltaTime;
+		if (state.angleY >= 2.f * M_PI)
+			state.angleY = 0.f;
+
+		if (state.transitionFactor != target)
+		{
+			float step = 2.0f * state.deltaTime;
+			if (state.transitionFactor < target)
+				state.transitionFactor = std::min(state.transitionFactor + step, 1.0f);
+			else
+				state.transitionFactor = std::max(state.transitionFactor - step, 0.0f);
+		}
 	}
 }
 
@@ -97,6 +131,8 @@ GLFWwindow* initWindow()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	// glfwSetCursorPosCallback(window, cursor_position_callback);
+
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -114,39 +150,7 @@ GLFWwindow* initWindow()
 
 void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
 {
-	float currentFrame = static_cast<float>(glfwGetTime());
-	state.deltaTime = currentFrame - state.lastFrame;
-	state.lastFrame = currentFrame;
-	state.second += state.deltaTime;
-	++state.fpsCounter;
-	if (state.second >= 1.f)
-	{
-		float fps = static_cast<float>(state.fpsCounter) / state.second;
-		// std::string FPS = std::to_string(fps);
-		// std:: string ms = std::to_string(1000.f / fps);
-		// std::string newTitle = "scop - " + FPS + " fps / " + ms + " ms";
-		std::stringstream ss;
-		ss << "scop - " << std::fixed << std::setprecision(0) << fps;
-		ss << " fps / " << std::fixed << std::setprecision(1) << 1000.f / fps << " ms";
-		glfwSetWindowTitle(window, ss.str().c_str());
-		state.fpsCounter = 0;
-		state.second = 0;
-	}
-	float target = state.showTexture ? 1.0f : 0.0f;
-	state.movementSpeed = data.model.radius * state.deltaTime * 0.5f;
-	if (state.isRotatingY)
-		state.angleY += state.deltaTime;
-	if (state.angleY >= 2.f * M_PI)
-		state.angleY = 0.f;
-
-	if (state.transitionFactor != target)
-	{
-		float step = 2.0f * state.deltaTime;
-		if (state.transitionFactor < target)
-			state.transitionFactor = std::min(state.transitionFactor + step, 1.0f);
-		else
-			state.transitionFactor = std::max(state.transitionFactor - step, 0.0f);
-	}
+	updateAppState(window, state, data.model.radius);
 
 	processInput(window, state);
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);

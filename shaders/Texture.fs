@@ -39,6 +39,7 @@ uniform Material material;
 uniform Illum	illum;
 uniform vec4 viewPos;
 uniform float transition;
+uniform float Ztrunc;
 
 vec3 GetTriPlanarTexture(vec3 currNorm)
 {
@@ -91,6 +92,8 @@ vec3 ComputePhong(vec3 baseColor, vec3 norm, vec3 lightDir, vec3 viewDir)
 
 void main()
 {
+	if (FragPos.z > Ztrunc)
+		discard;
 	vec3 fdx = dFdx(FragPosLocal);
 	vec3 fdy = dFdy(FragPosLocal);
 	vec3 faceNormal = normalize(cross(fdx, fdy));

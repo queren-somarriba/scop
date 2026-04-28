@@ -95,10 +95,12 @@ struct AppState
 	float	lastFrame;
 	float	second;
 	float	transitionFactor;
+	float	modelRadius;
 	float	movementSpeed;
 	float	angleX = 0.f;
 	float	angleY = 0.f;
 	float	angleZ = 0.f;
+	float	trunc;
 	size_t	fpsCounter;
 	bool	isRotatingY;
 	bool	showTexture;
@@ -112,6 +114,7 @@ struct AppState
 		deltaTime(0.0f), lastFrame(0.0f),
 		transitionFactor(1.f),
 		angleX(0.f), angleY(0.f), angleZ(0.f),
+		trunc(1.f),
 		isRotatingY(true),
 		showTexture(true),
 		t_pressed(false), x_pressed(false), 

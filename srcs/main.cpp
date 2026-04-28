@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 			AppState state;
 			setupData(data, state, argv[1]);
 			
-			glfwSetWindowUserPointer(window, &state);
+			glfwSetWindowUserPointer(window, &data);
 
 			while (!glfwWindowShouldClose(window))
 				renderOBJ(window, data, state);

@@ -36,15 +36,6 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 		this->pos -= this->up * velocity;
 }
 
-void Camera::ProcessMouseScroll(float yoffset)
-{
-	this->zoom -= (float)yoffset;
-	if (this->zoom < 1.0f)
-		this->zoom = 1.0f;
-	if (this->zoom > 45.0f)
-		this->zoom = 45.0f;
-}
-
 void Camera::updateCameraVectors()
 {
 	vect4f front;
