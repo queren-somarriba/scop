@@ -28,13 +28,12 @@ int main(int argc, char** argv)
 
 		{
 			scopData data = {};
-			AppState state;
-			setupData(data, state, argv[1]);
+			setupData(data, argv[1]);
 			
 			glfwSetWindowUserPointer(window, &data);
 
 			while (!glfwWindowShouldClose(window))
-				renderOBJ(window, data, state);
+				renderOBJ(window, data);
 		}
 
 		glfwDestroyWindow(window);

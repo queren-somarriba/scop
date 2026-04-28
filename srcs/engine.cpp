@@ -17,24 +17,23 @@ namespace
 		glViewport(0, 0, width, height);
 	}
 
-	void setTextureContext(scopData& data, AppState& state)
+	void setTextureContext(scopData& data)
 	{
-		mat4f view = state.camera.GetViewMatrix();
-		mat4f projection = mat4f::perspective(state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
-														state.camera.pos.z + data.model.radius);
+		mat4f view = data.state.camera.GetViewMatrix();
+		mat4f projection = mat4f::perspective(data.state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
+														data.state.camera.pos.z + data.model.radius);
 
-		mat4f model = mat4f::rotate(state.angleX, vect4f(1.f, 0.f, 0.f));
-		model = model * mat4f::rotate(state.angleY, vect4f(0.f, 1.f, 0.f));
-		model = model * mat4f::rotate(state.angleZ, vect4f(0.f, 0.f, 1.f));
+		mat4f model = mat4f::rotate(data.state.angleX, vect4f(1.f, 0.f, 0.f));
+		model = model * mat4f::rotate(data.state.angleY, vect4f(0.f, 1.f, 0.f));
 		vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
 		vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
-		vect4f lightPos = state.camera.pos;
+		vect4f lightPos = data.state.camera.pos;
 
 		data.shaderTexture->use();
-		data.shaderTexture->setFloat("Ztrunc", state.trunc);
+		data.shaderTexture->setFloat("Ztrunc", data.state.trunc);
 		data.shaderTexture->setFloat("radius", data.model.radius);
-		data.shaderTexture->setFloat("transition", state.transitionFactor);
-		data.shaderTexture->setVec4("viewPos", state.camera.pos);
+		data.shaderTexture->setFloat("transition", data.state.transitionFactor);
+		data.shaderTexture->setVec4("viewPos", data.state.camera.pos);
 		data.shaderTexture->setMat4("model", model);
 		data.shaderTexture->setMat4("view", view);
 		data.shaderTexture->setMat4("projection", projection);
@@ -131,9 +130,7 @@ GLFWwindow* initWindow()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-	// glfwSetCursorPosCallback(window, cursor_position_callback);
-
-
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -148,19 +145,25 @@ GLFWwindow* initWindow()
 	return window;
 }
 
-void renderOBJ(GLFWwindow* window, scopData& data, AppState& state)
+void renderOBJ(GLFWwindow* window, scopData& data)
 {
-	updateAppState(window, state, data.model.radius);
+	updateAppState(window, data.state, data.model.radius);
 
-	processInput(window, state);
+	processInput(window, data.state);
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	setTextureContext(data, state);
+	setTextureContext(data);
 
 	glActiveTexture(GL_TEXTURE0);
-	if (data.activeMaterial)
+	if (data.activeMaterial && data.activeMaterial->texture)
 		glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
+	else
+	{
+		Texture default_texture("resources/assets/mou2.bmp");
+		if (default_texture.id)
+			glBindTexture(GL_TEXTURE_2D, default_texture.id);
+	}
 
 	data.vao.bind();
 	setMeshContexteAndDraw(data);

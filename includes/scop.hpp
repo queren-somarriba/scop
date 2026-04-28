@@ -74,20 +74,6 @@ struct MeshDraw
 	int			count;
 };
 
-struct scopData
-{
-	ObjModel					model;
-	std::vector<MeshDraw>		meshDraws;
-	Material*					activeMaterial;
-	VAO							vao;
-	std::unique_ptr<VBO>		vbo;
-	std::unique_ptr<EBO>		ebo;
-	std::unique_ptr<Shader>		shaderTexture;
-	std::unique_ptr<Shader>		shaderLight;
-	//std::unique_ptr<Texture>	texture;
-	int							vertexCount;
-};
-
 struct AppState
 {
 	Camera	camera;
@@ -99,26 +85,41 @@ struct AppState
 	float	movementSpeed;
 	float	angleX = 0.f;
 	float	angleY = 0.f;
-	float	angleZ = 0.f;
 	float	trunc;
 	size_t	fpsCounter;
+	double	lastX;
+	double	lastY;
 	bool	isRotatingY;
 	bool	showTexture;
 	bool	t_pressed;
-	bool	x_pressed;
-	bool	z_pressed;
 	bool	space_pressed;
+	bool	mouse_pressed;
 	
 	AppState() : 
 		camera(vect4f(0.0f, 0.0f, 3.0f)), 
 		deltaTime(0.0f), lastFrame(0.0f),
 		transitionFactor(1.f),
-		angleX(0.f), angleY(0.f), angleZ(0.f),
+		angleX(0.f), angleY(0.f),
 		trunc(1.f),
 		isRotatingY(true),
 		showTexture(true),
-		t_pressed(false), x_pressed(false), 
-		z_pressed(false), space_pressed(false) {}
+		t_pressed(false), space_pressed(false),
+		mouse_pressed(false) {}
+};
+
+struct scopData
+{
+	ObjModel					model;
+	AppState					state;
+	std::vector<MeshDraw>		meshDraws;
+	Material*					activeMaterial;
+	VAO							vao;
+	std::unique_ptr<VBO>		vbo;
+	std::unique_ptr<EBO>		ebo;
+	std::unique_ptr<Shader>		shaderTexture;
+	std::unique_ptr<Shader>		shaderLight;
+	//std::unique_ptr<Texture>	texture;
+	int							vertexCount;
 };
 
 

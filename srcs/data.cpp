@@ -145,7 +145,7 @@ namespace
 			n = n.normalize();
 	}
 }
-void setupData(scopData& data, AppState& state, const std::string& objPath)
+void setupData(scopData& data, const std::string& objPath)
 {
 	data.model = parseOBJ(objPath);
 
@@ -155,11 +155,11 @@ void setupData(scopData& data, AppState& state, const std::string& objPath)
 	float fov = 45.f * ( M_PI / 180.f);
 	float distance = (data.model.radius / std::tan(fov * 0.5f)) * 1.5f;
 
-	state.camera.pos = vect4f(0.f, 0.f, distance);
+	data.state.camera.pos = vect4f(0.f, 0.f, distance);
 	std::vector<float> vertices = flattenObjModel(data.model, data.meshDraws);
 	data.vertexCount = static_cast<int>(vertices.size() / 11);
-	state.trunc *= data.model.radius;
-	state.modelRadius = data.model.radius;
+	data.state.trunc *= data.model.radius;
+	data.state.modelRadius = data.model.radius;
 
 	activateMaterial(data);
 

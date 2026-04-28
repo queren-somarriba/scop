@@ -2,4 +2,4 @@
 
 #include "scop.hpp"
 
-void setupData(scopData& data, AppState& state, const std::string& objPath);
+void setupData(scopData& data, const std::string& objPath);

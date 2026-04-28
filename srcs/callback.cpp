@@ -19,38 +19,40 @@ namespace
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			state.camera.ProcessKeyboard(DOWN, state.movementSpeed);
 	}
+}
 
-	void InputRotateModel(GLFWwindow *window, AppState& state)
+void MouseRotateModel(GLFWwindow* window, AppState& state)
+{
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	if (state.mouse_pressed)
 	{
-		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !state.t_pressed)
-		{
-			state.showTexture = !state.showTexture;
-			state.t_pressed = true;
-		}
-		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)
-			state.t_pressed = false;
-		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !state.x_pressed)
-		{
-			state.angleX += 1.5708f;
-			state.x_pressed = true;
-		}
-		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE)
-			state.x_pressed = false;
-		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !state.z_pressed)
-		{
-			state.angleZ += 1.5708f;
-			state.z_pressed = true;
-		}
-		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_RELEASE)
-			state.z_pressed = false;
+		float deltaX = static_cast<float>(xpos - state.lastX);
+		float deltaY = static_cast<float>(ypos - state.lastY);
+
+		float sensitivity = 0.005f;
+
+		state.angleY += deltaX * sensitivity;
+		state.angleX += deltaY * sensitivity;
 	}
+
+	state.lastX = xpos;
+	state.lastY = ypos;
 }
 
 void processInput(GLFWwindow *window, AppState& state)
 {
 	InputMoveCam(window, state);
-	InputRotateModel(window, state);
+	MouseRotateModel(window, state);
 
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !state.t_pressed)
+	{
+		state.showTexture = !state.showTexture;
+		state.t_pressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE)
+		state.t_pressed = false;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		state.trunc += 0.01f * state.modelRadius;
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -65,7 +67,7 @@ void processInput(GLFWwindow *window, AppState& state)
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-}
+	}
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -76,16 +78,18 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		data->activeMaterial->Ns += static_cast<float>(yoffset);
 }
 
-// void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-// {
-// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-// 	{
-// 		glfwGetCursorPos(window, &xpos, &ypos);
-// 		std::cout << "startX= " << xpos << ", startY= " << ypos << std::endl;
-// 	}
-// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-// 	{
-// 		glfwGetCursorPos(window, &xpos, &ypos);
-// 		std::cout << "endX= " << xpos << ", endY= " << ypos << std::endl;
-// 	}
-// }
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	(void)mods;
+	scopData* data = reinterpret_cast<scopData*>(glfwGetWindowUserPointer(window));
+	if (!data)
+		return;
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT)
+	{
+		if (action == GLFW_PRESS)
+			data->state.mouse_pressed = true;
+		else if (action == GLFW_RELEASE)
+			data->state.mouse_pressed = false;
+	}
+}

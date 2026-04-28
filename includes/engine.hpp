@@ -9,4 +9,4 @@ constexpr unsigned int SCR_HEIGHT = 600;
 
 GLFWwindow* initWindow();
 
-void		renderOBJ(GLFWwindow* window, scopData& data, AppState& state);
+void		renderOBJ(GLFWwindow* window, scopData& data);
