@@ -123,8 +123,8 @@ namespace
 			texture_path = "resources/" + texture_path;
 			current->texture = std::make_unique<Texture>(texture_path.c_str());
 		}
-		else if (!current->texture)
-			current->texture = std::make_unique<Texture>("resources/assets/mou2.bmp");
+		if (!(current->texture))
+			current->texture = std::make_unique<Texture>("./resources/assets/mou2.bmp");
 	}
 
 	void assignOBJValue(std::string& line, ObjModel& model, std::string& currentMaterial,

@@ -118,7 +118,8 @@ struct scopData
 	std::unique_ptr<EBO>		ebo;
 	std::unique_ptr<Shader>		shaderTexture;
 	std::unique_ptr<Shader>		shaderLight;
-	//std::unique_ptr<Texture>	texture;
+	std::unique_ptr<Texture>	default_texture;
+	float						noTextureNs = 32.f;
 	int							vertexCount;
 };
 

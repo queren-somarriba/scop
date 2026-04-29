@@ -44,7 +44,7 @@ namespace
 		data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
 		data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
 		data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
-		data.shaderTexture->setFloat("illum.shininess", 32.f);
+		data.shaderTexture->setFloat("illum.shininess", data.noTextureNs);
 		
 	}
 
@@ -66,6 +66,7 @@ namespace
 				data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
 				data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
 				data.shaderTexture->setFloat("material.shininess", 32.f);
+
 			}
 			glDrawArrays(GL_TRIANGLES, md.offset, md.count);
 		}
@@ -154,21 +155,6 @@ void renderOBJ(GLFWwindow* window, scopData& data)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	setTextureContext(data);
-
-	// glActiveTexture(GL_TEXTURE0);
-	// if (data.activeMaterial && data.activeMaterial->texture)
-	// {
-	// 	std::cout << "mat: " << data.activeMaterial->name << std::endl;
-	// 	glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
-	// }
-	// else
-	// {
-	// 	std::cout << "defmat" << std::endl;
-	// 	Texture default_texture("./resources/assets/mou2.bmp");
-	// 	std::cout << "id= " << default_texture.id << std::endl;
-	// 	if (default_texture.id)
-	// 		glBindTexture(GL_TEXTURE_2D, default_texture.id);
-	// }
 
 	data.vao.bind();
 	setMeshContexteAndDraw(data);
