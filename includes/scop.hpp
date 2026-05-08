@@ -65,6 +65,7 @@ struct ObjModel
 	vect4f centroid{0.0f, 0.0f, 0.0f};
 	float	radius = 1.f;
 	int		modelVertexCount;
+	bool	hasUV = 0;
 };
 
 struct MeshDraw

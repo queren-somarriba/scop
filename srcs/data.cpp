@@ -1,77 +1,89 @@
 #include "scop.hpp"
+#include "data.hpp"
 #include <vector>
+#include <map>
 
 namespace
 {
-	std::vector<float> flattenObjModel(const ObjModel& model, std::vector<MeshDraw>& meshDraws)
+	void flattenObjModel(const ObjModel& model, std::vector<float>&  vertices,
+							std::vector<GLuint>& indices, std::vector<MeshDraw>& meshDraws)
 	{
-		std::vector<float> vertices;
+		vertices.clear();
+		indices.clear();
 		meshDraws.clear();
 
 		const int STRIDE = 11;
 
-		int totalFaces = 0;
-		for (const Mesh& mesh : model.meshes)
-			totalFaces += static_cast<int>(mesh.faces.size());
+		std::map<VertexKey, GLuint> tmp;
 
 		int faceIndex = 0;
 
 		for (const Mesh& mesh : model.meshes)
 		{
 			MeshDraw md;
-			md.offset        = static_cast<int>(vertices.size() / STRIDE);
+			md.offset  = static_cast<int>(indices.size());
 			md.material_name = mesh.material_name;
 
 			for (const Face& face : mesh.faces)
 			{
-				float r = std::fmod(faceIndex * 0.618f,       1.f);
+				float r = std::fmod(faceIndex * 0.618f, 1.f);
 				float b = std::fmod(faceIndex * 0.618f * 3.f, 1.f);
 
 				for (int i = 0; i < 3; ++i)
 				{
 					const FaceVertex& fv = face.vertices[i];
-					const vect4f& p = model.positions[fv.pos_idx];
+					VertexKey key{ fv.pos_idx, fv.uv_idx, fv.normal_idx };
 
-					vertices.push_back(p.x - model.centroid.x);
-					vertices.push_back(p.y - model.centroid.y);
-					vertices.push_back(p.z - model.centroid.z);
-
-					if (fv.normal_idx >= 0 && fv.normal_idx < (int)model.normals.size())
-					{
-						const vect4f& n = model.normals[fv.normal_idx];
-						vertices.push_back(n.x);
-						vertices.push_back(n.y);
-						vertices.push_back(n.z);
-					}
+					auto it = tmp.find(key);
+					if (it != tmp.end())
+						indices.push_back(it->second);
 					else
 					{
-						vertices.push_back(0.f);
-						vertices.push_back(1.f);
-						vertices.push_back(0.f);
-					}
-					if (fv.uv_idx >= 0 && fv.uv_idx < (int)model.uvs.size())
-					{
-						vertices.push_back(model.uvs[fv.uv_idx].x);
-						vertices.push_back(model.uvs[fv.uv_idx].y);
-					}
-					else
-					{
-						vertices.push_back(0.f);
-						vertices.push_back(0.f);
-					}
+						GLuint idx = static_cast<GLuint>(vertices.size() / STRIDE);
+						tmp[key] = idx;
+						indices.push_back(idx);
 
-					vertices.push_back(r);
-					vertices.push_back(0.f);
-					vertices.push_back(b);
+						const vect4f& p = model.positions[fv.pos_idx];
+						vertices.push_back(p.x - model.centroid.x);
+						vertices.push_back(p.y - model.centroid.y);
+						vertices.push_back(p.z - model.centroid.z);
+
+						if (fv.normal_idx >= 0 && fv.normal_idx < (int)model.normals.size())
+						{
+							const vect4f& n = model.normals[fv.normal_idx];
+							vertices.push_back(n.x);
+							vertices.push_back(n.y);
+							vertices.push_back(n.z);
+						}
+						else
+						{
+							vertices.push_back(0.f);
+							vertices.push_back(1.f);
+							vertices.push_back(0.f);
+						}
+
+						if (fv.uv_idx >= 0 && fv.uv_idx < (int)model.uvs.size())
+						{
+							vertices.push_back(model.uvs[fv.uv_idx].x);
+							vertices.push_back(model.uvs[fv.uv_idx].y);
+						}
+						else
+						{
+							vertices.push_back(0.f);
+							vertices.push_back(0.f);
+						}
+						vertices.push_back(r);
+						vertices.push_back(0.f);
+						vertices.push_back(b);
+					}
 				}
-				++faceIndex;
+			++faceIndex;
 			}
 
-			md.count = static_cast<int>(vertices.size() / STRIDE) - md.offset;
-			if (md.count > 0)
-				meshDraws.push_back(md);
+		md.count = static_cast<int>(indices.size()) - md.offset;
+		if (md.count > 0)
+			meshDraws.push_back(md);
 		}
-		return vertices;
 	}
 
 	void activateMaterial(scopData& data)
@@ -92,20 +104,23 @@ namespace
 		}
 	}
 
-	void setupVertex(scopData& data, std::vector<float>& vertices)
+
+	void setupVertex(scopData& data, std::vector<float>& vertices, std::vector<GLuint>& indices)
 	{
 		data.vao.bind();
+
 		data.vbo = std::make_unique<VBO>(vertices.data(), vertices.size() * sizeof(float));
+		data.ebo = std::make_unique<EBO>(indices.data(), indices.size() * sizeof(GLuint));
 
 		data.vao.linkAttrib(*data.vbo, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
 		data.vao.linkAttrib(*data.vbo, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 		data.vao.linkAttrib(*data.vbo, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 		data.vao.linkAttrib(*data.vbo, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-		
+
 		data.vao.unbind();
 		data.vbo->unbind();
-
 	}
+
 
 	void computeModelNormals(ObjModel& model)
 	{
@@ -145,26 +160,29 @@ namespace
 			n = n.normalize();
 	}
 }
+
 void setupData(scopData& data, const std::string& objPath)
 {
 	data.model = parseOBJ(objPath);
 
 	if (data.model.normals.empty())
 		computeModelNormals(data.model);
-	
-	float fov = 45.f * ( M_PI / 180.f);
-	float distance = (data.model.radius / std::tan(fov * 0.5f)) * 1.5f;
 
+	float fov   = 45.f * (M_PI / 180.f);
+	float distance = (data.model.radius / std::tan(fov * 0.5f)) * 1.5f;
 	data.state.camera.pos = vect4f(0.f, 0.f, distance);
-	std::vector<float> vertices = flattenObjModel(data.model, data.meshDraws);
-	data.vertexCount = static_cast<int>(vertices.size() / 11);
-	data.state.trunc *= data.model.radius;
+
+	std::vector<float> vertices;
+	std::vector<GLuint> indices;
+	flattenObjModel(data.model, vertices, indices, data.meshDraws);
+
+	data.vertexCount   = static_cast<int>(indices.size());
+	data.state.trunc   *= data.model.radius;
 	data.state.modelRadius = data.model.radius;
 
 	activateMaterial(data);
-
-	setupVertex(data, vertices);
+	setupVertex(data, vertices, indices);
 
 	data.default_texture = std::make_unique<Texture>("resources/assets/vg2.bmp");
-	data.shaderTexture = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
+	data.shaderTexture  = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
 }

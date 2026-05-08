@@ -40,12 +40,13 @@ uniform Illum	illum;
 uniform vec4 viewPos;
 uniform float transition;
 uniform float Ztrunc;
+uniform bool hasUV;
 
 vec3 GetTriPlanarTexture(vec3 currNorm)
 {
 	vec3 blending = abs(currNorm);
 
-	float sharpness = 8.0;
+	float sharpness = 100.0;
 	blending.x = pow(blending.x, sharpness);
 	blending.y = pow(blending.y, sharpness);
 	blending.z = pow(blending.z, sharpness);
@@ -99,8 +100,8 @@ void main()
 	vec3 faceNormal = normalize(cross(fdx, fdy));
 	vec3 norm = gl_FrontFacing ? normalize(Normal) : -normalize(Normal);
 
-	vec3 triPlanarColor = GetTriPlanarTexture(faceNormal);
-	vec3 mixColor = mix(triPlanarColor, FaceColor, transition);
+	vec3 texColor = hasUV ? texture(ourTexture, TexCoord).rgb : GetTriPlanarTexture(faceNormal);
+	vec3 mixColor = mix(texColor, FaceColor, transition);
 
 	vec3 lightDir = normalize(vec3(light.position) - FragPos);
 	vec3 viewDir = normalize(vec3(viewPos) - FragPos);

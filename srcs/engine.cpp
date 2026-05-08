@@ -45,6 +45,7 @@ namespace
 		data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
 		data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
 		data.shaderTexture->setFloat("illum.shininess", data.noTextureNs);
+		data.shaderTexture->setBool("hasUV", data.model.hasUV);
 		
 	}
 
@@ -68,7 +69,7 @@ namespace
 				data.shaderTexture->setFloat("material.shininess", 32.f);
 
 			}
-			glDrawArrays(GL_TRIANGLES, md.offset, md.count);
+			glDrawElements(GL_TRIANGLES, md.count, GL_UNSIGNED_INT, (void*)(md.offset * sizeof(GLuint)));
 		}
 	}
 

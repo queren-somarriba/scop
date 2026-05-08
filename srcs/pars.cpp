@@ -147,6 +147,7 @@ namespace
 		}
 		else if (keyword == "vt")
 		{
+			model.hasUV = 1;
 			Vec2 uv{};
 			ss >> uv.x >> uv.y;
 			model.uvs.push_back(uv);
