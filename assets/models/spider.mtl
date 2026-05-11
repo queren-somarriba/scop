@@ -9,5 +9,5 @@ newmtl spider
 	Kd 0.8000 0.8000 0.8000
 	Ks 1.0000 1.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/soulage.bmp
-	map_Kd assets/soulage.bmp
+	map_Ka textures/soulage.bmp
+	map_Kd textures/soulage.bmp

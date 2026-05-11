@@ -5,5 +5,5 @@ newmtl None
 	Kd 0.8000 0.8000 0.8000
 	Ks 1.0000 1.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/bot.bmp
-	map_Kd assets/bot.bmp
+	map_Ka textures/uvmap.bmp
+	map_Kd textures/uvmap.bmp

@@ -183,6 +183,6 @@ void setupData(scopData& data, const std::string& objPath)
 	activateMaterial(data);
 	setupVertex(data, vertices, indices);
 
-	data.default_texture = std::make_unique<Texture>("resources/assets/vg2.bmp");
+	data.default_texture = std::make_unique<Texture>("assets/models/textures/vg2.bmp");
 	data.shaderTexture  = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
 }

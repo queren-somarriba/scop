@@ -5,8 +5,8 @@ newmtl eye
 	Kd 0.8000 0.8000 0.8000
 	Ks 1.0000 1.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/vas2.bmp
-	map_Kd assets/vas2.bmp
+	map_Ka textures/vas2.bmp
+	map_Kd textures/vas2.bmp
 
 newmtl eye2
 	Ns 100.0000
@@ -15,8 +15,8 @@ newmtl eye2
 	Kd 0.8000 0.0000 0.0000
 	Ks 0.0000 1.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/vas2.bmp
-	map_Kd assets/vas2.bmp
+	map_Ka textures/vas2.bmp
+	map_Kd textures/vas2.bmp
 
 newmtl eye3
 	Ns 50.0000
@@ -25,8 +25,8 @@ newmtl eye3
 	Kd 0.0000 0.0000 0.2000
 	Ks 1.0000 1.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/vas2.bmp
-	map_Kd assets/vas2.bmp
+	map_Ka textures/vas2.bmp
+	map_Kd textures/vas2.bmp
 
 newmtl eye4
 	Ns 50.0000
@@ -35,5 +35,5 @@ newmtl eye4
 	Kd 0.8000 0.8000 0.8000
 	Ks 1.0000 1.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/vas2.bmp
-	map_Kd assets/vas2.bmp
+	map_Ka textures/vas2.bmp
+	map_Kd textures/vas2.bmp

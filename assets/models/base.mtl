@@ -5,5 +5,5 @@ newmtl base
 	Kd 0.8000 0.8000 0.8000
 	Ks 1.0000 0.0000 1.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka assets/mol5.bmp
-	map_Kd assets/mol5.bmp
+	map_Ka textures/mol5.bmp
+	map_Kd textures/mol5.bmp
