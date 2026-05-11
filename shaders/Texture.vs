@@ -7,7 +7,7 @@ layout (location = 3) in vec3 aColor;
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
-out vec3 FaceColor;
+flat out vec3 FaceColor;
 out vec3 FragPosLocal;
 
 uniform float radius;

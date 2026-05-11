@@ -7,7 +7,9 @@ namespace
 {
 	vect4f randomColor(unsigned int idx)
 	{
-		return vect4f(std::fmod(idx * 0.618f, 1.f), 0.f, std::fmod(idx * 0.618f * 3.f, 1.f));
+		float r = std::fmod(idx * 0.123f, 0.8f) + 0.2f;
+		float b = std::fmod(idx * 0.789f, 0.8f) + 0.2f;
+		return vect4f(r, 0.f, b, 1.f);
 	}
 
 	void computeVertexData(const ObjModel& model, std::vector<float>& vertices, std::map<VertexKey, GLuint>& tmp, std::vector<GLuint>& indices, int faceIndex,

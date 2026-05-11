@@ -30,7 +30,7 @@ struct Light
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoord;
-in vec3 FaceColor;
+flat in vec3 FaceColor;
 in vec3 FragPosLocal;
 
 uniform sampler2D ourTexture;
