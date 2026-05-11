@@ -41,7 +41,7 @@ namespace
 	}
 }
 
-void processInput(GLFWwindow *window, AppState& state)
+void handleControls(GLFWwindow *window, AppState& state)
 {
 	InputMoveCam(window, state);
 	MouseRotateModel(window, state);

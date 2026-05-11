@@ -78,6 +78,8 @@ struct MeshDraw
 struct AppState
 {
 	Camera	camera;
+	double	lastX;
+	double	lastY;
 	float	deltaTime;
 	float	lastFrame;
 	float	second;
@@ -88,8 +90,6 @@ struct AppState
 	float	angleY = 0.f;
 	float	trunc;
 	size_t	fpsCounter;
-	double	lastX;
-	double	lastY;
 	bool	isRotatingY;
 	bool	showTexture;
 	bool	t_pressed;

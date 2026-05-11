@@ -15,4 +15,4 @@ struct VertexKey
 	}
 };
 
-void setupData(scopData& data, const std::string& objPath);
+void loadModelToGPU(scopData& data, const std::string& objPath);

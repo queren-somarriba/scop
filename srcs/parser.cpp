@@ -9,7 +9,7 @@
 
 namespace
 {
-	void computeBounds(ObjModel& model)
+	void normalizeModelScale(ObjModel& model)
 	{
 		if (model.positions.empty())
 			return;
@@ -260,7 +260,7 @@ ObjModel parseOBJ(const std::string& path)
 		model.meshes.end()
 	);
 
-	computeBounds(model);
+	normalizeModelScale(model);
 
 	return model;
 }

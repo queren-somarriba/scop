@@ -1,10 +1,62 @@
 #include "scop.hpp"
-#include "data.hpp"
+#include "GeometryProcessor.hpp"
 #include <vector>
 #include <map>
 
 namespace
 {
+	vect4f randomColor(unsigned int idx)
+	{
+		return vect4f(std::fmod(idx * 0.618f, 1.f), 0.f, std::fmod(idx * 0.618f * 3.f, 1.f));
+	}
+
+	void computeVertexData(const ObjModel& model, std::vector<float>& vertices, std::map<VertexKey, GLuint>& tmp, std::vector<GLuint>& indices, int faceIndex,
+							const FaceVertex& fv, const VertexKey key)
+	{
+		const int STRIDE = 11;
+		vect4f color;
+
+		GLuint idx = static_cast<GLuint>(vertices.size() / STRIDE);
+
+		tmp[key] = idx;
+		indices.push_back(idx);
+
+
+		const vect4f& p = model.positions[fv.pos_idx];
+		vertices.push_back(p.x - model.centroid.x);
+		vertices.push_back(p.y - model.centroid.y);
+		vertices.push_back(p.z - model.centroid.z);
+
+		if (fv.normal_idx >= 0 && fv.normal_idx < (int)model.normals.size())
+		{
+			const vect4f& n = model.normals[fv.normal_idx];
+			vertices.push_back(n.x);
+			vertices.push_back(n.y);
+			vertices.push_back(n.z);
+		}
+		else
+		{
+			vertices.push_back(0.f);
+			vertices.push_back(1.f);
+			vertices.push_back(0.f);
+		}
+
+		if (fv.uv_idx >= 0 && fv.uv_idx < (int)model.uvs.size())
+		{
+			vertices.push_back(model.uvs[fv.uv_idx].x);
+			vertices.push_back(model.uvs[fv.uv_idx].y);
+		}
+		else
+		{
+			vertices.push_back(0.f);
+			vertices.push_back(0.f);
+		}
+		color = randomColor(faceIndex);
+		vertices.push_back(color.getX());
+		vertices.push_back(color.getY());
+		vertices.push_back(color.getZ());
+	}
+
 	void flattenObjModel(const ObjModel& model, std::vector<float>&  vertices,
 							std::vector<GLuint>& indices, std::vector<MeshDraw>& meshDraws)
 	{
@@ -12,10 +64,7 @@ namespace
 		indices.clear();
 		meshDraws.clear();
 
-		const int STRIDE = 11;
-
 		std::map<VertexKey, GLuint> tmp;
-
 		int faceIndex = 0;
 
 		for (const Mesh& mesh : model.meshes)
@@ -26,9 +75,6 @@ namespace
 
 			for (const Face& face : mesh.faces)
 			{
-				float r = std::fmod(faceIndex * 0.618f, 1.f);
-				float b = std::fmod(faceIndex * 0.618f * 3.f, 1.f);
-
 				for (int i = 0; i < 3; ++i)
 				{
 					const FaceVertex& fv = face.vertices[i];
@@ -38,44 +84,7 @@ namespace
 					if (it != tmp.end())
 						indices.push_back(it->second);
 					else
-					{
-						GLuint idx = static_cast<GLuint>(vertices.size() / STRIDE);
-						tmp[key] = idx;
-						indices.push_back(idx);
-
-						const vect4f& p = model.positions[fv.pos_idx];
-						vertices.push_back(p.x - model.centroid.x);
-						vertices.push_back(p.y - model.centroid.y);
-						vertices.push_back(p.z - model.centroid.z);
-
-						if (fv.normal_idx >= 0 && fv.normal_idx < (int)model.normals.size())
-						{
-							const vect4f& n = model.normals[fv.normal_idx];
-							vertices.push_back(n.x);
-							vertices.push_back(n.y);
-							vertices.push_back(n.z);
-						}
-						else
-						{
-							vertices.push_back(0.f);
-							vertices.push_back(1.f);
-							vertices.push_back(0.f);
-						}
-
-						if (fv.uv_idx >= 0 && fv.uv_idx < (int)model.uvs.size())
-						{
-							vertices.push_back(model.uvs[fv.uv_idx].x);
-							vertices.push_back(model.uvs[fv.uv_idx].y);
-						}
-						else
-						{
-							vertices.push_back(0.f);
-							vertices.push_back(0.f);
-						}
-						vertices.push_back(r);
-						vertices.push_back(0.f);
-						vertices.push_back(b);
-					}
+						computeVertexData(model, vertices, tmp, indices, faceIndex, fv, key);
 				}
 			++faceIndex;
 			}
@@ -105,7 +114,7 @@ namespace
 	}
 
 
-	void setupVertex(scopData& data, std::vector<float>& vertices, std::vector<GLuint>& indices)
+	void initializeBuffers(scopData& data, std::vector<float>& vertices, std::vector<GLuint>& indices)
 	{
 		data.vao.bind();
 
@@ -161,7 +170,7 @@ namespace
 	}
 }
 
-void setupData(scopData& data, const std::string& objPath)
+void loadModelToGPU(scopData& data, const std::string& objPath)
 {
 	data.model = parseOBJ(objPath);
 
@@ -181,7 +190,7 @@ void setupData(scopData& data, const std::string& objPath)
 	data.state.modelRadius = data.model.radius;
 
 	activateMaterial(data);
-	setupVertex(data, vertices, indices);
+	initializeBuffers(data, vertices, indices);
 
 	data.default_texture = std::make_unique<Texture>("assets/models/textures/vg2.bmp");
 	data.shaderTexture  = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");

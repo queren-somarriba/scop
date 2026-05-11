@@ -32,14 +32,14 @@ SRCS		= $(SRCS_DIR)/main.cpp \
 			$(CLASS_CPP)/VBO.cpp \
 			$(CLASS_CPP)/EBO.cpp \
 			$(CLASS_CPP)/VAO.cpp \
-			$(SRCS_DIR)/pars.cpp \
-			$(SRCS_DIR)/engine.cpp \
+			$(SRCS_DIR)/parser.cpp \
+			$(SRCS_DIR)/Renderer.cpp \
 			$(CLASS_CPP)/shader.cpp \
 			$(CLASS_CPP)/texture.cpp \
 			$(CLASS_CPP)/camera.cpp \
 			$(SRCS_DIR)/utils.cpp \
-			$(SRCS_DIR)/callback.cpp \
-			$(SRCS_DIR)/data.cpp
+			$(SRCS_DIR)/InputHandler.cpp \
+			$(SRCS_DIR)/GeometryProcessor.cpp
 
 OBJS		= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

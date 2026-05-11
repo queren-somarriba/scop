@@ -1,10 +1,10 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
-#include "engine.hpp"
+#include "Renderer.hpp"
 #include "scop.hpp"
 #include "utils.hpp"
 #include <iostream>
-#include "data.hpp"
+#include "GeometryProcessor.hpp"
 #include <memory>
 
 int main(int argc, char** argv)
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
 		{
 			scopData data = {};
-			setupData(data, argv[1]);
+			loadModelToGPU(data, argv[1]);
 			
 			glfwSetWindowUserPointer(window, &data);
 

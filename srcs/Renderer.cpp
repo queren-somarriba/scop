@@ -5,9 +5,9 @@
 #include <iomanip>
 #include "mat4f.hpp"
 #include "texture.hpp"
-#include "engine.hpp"
+#include "Renderer.hpp"
 #include "camera.hpp"
-#include "callback.hpp"
+#include "InputHandler.hpp"
 
 namespace
 {
@@ -151,7 +151,7 @@ void renderOBJ(GLFWwindow* window, scopData& data)
 {
 	updateAppState(window, data.state, data.model.radius);
 
-	processInput(window, data.state);
+	handleControls(window, data.state);
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
