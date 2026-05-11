@@ -3,6 +3,8 @@
 
 bool isValidFile(const std::string& filePath)
 {
+	if (filePath.compare(filePath.size() - 4, 4, ".obj"))
+		return 0;
 	std::filesystem::path p(filePath);
 	return std::filesystem::exists(p) && std::filesystem::is_regular_file(p);
 }
