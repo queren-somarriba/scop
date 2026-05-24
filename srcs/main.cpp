@@ -34,14 +34,14 @@ int main(int argc, char** argv)
 			glfwSetWindowUserPointer(window, &data);
 
 
-			glActiveTexture(GL_TEXTURE0);
-			if (data.activeMaterial && data.activeMaterial->texture)
-				glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
-			else
-			{
-				if (data.default_texture->id)
-					glBindTexture(GL_TEXTURE_2D, data.default_texture->id);
-			}
+			// glActiveTexture(GL_TEXTURE0);
+			// if (data.activeMaterial && data.activeMaterial->texture)
+			// 	glBindTexture(GL_TEXTURE_2D, data.activeMaterial->texture->id);
+			// else
+			// {
+			// 	if (data.default_texture->id)
+			// 		glBindTexture(GL_TEXTURE_2D, data.default_texture->id);
+			// }
 			while (!glfwWindowShouldClose(window))
 				renderOBJ(window, data);
 		}
