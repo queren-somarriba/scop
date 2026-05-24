@@ -261,6 +261,5 @@ ObjModel parseOBJ(const std::string& path)
 	);
 
 	normalizeModelScale(model);
-
 	return model;
 }

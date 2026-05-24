@@ -17,7 +17,7 @@ namespace
 		glViewport(0, 0, width, height);
 	}
 
-	void setTextureContext(scopData& data)
+	void updateTextureContext(scopData& data)
 	{
 		mat4f view = data.state.camera.GetViewMatrix();
 		mat4f projection = mat4f::perspective(data.state.camera.zoom, (float)SCR_WIDTH/SCR_HEIGHT, 0.1f,
@@ -25,28 +25,14 @@ namespace
 
 		mat4f model = mat4f::rotate(data.state.angleX, vect4f(1.f, 0.f, 0.f));
 		model = model * mat4f::rotate(data.state.angleY, vect4f(0.f, 1.f, 0.f));
-		vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
-		vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
-		vect4f lightPos = data.state.camera.pos;
 
-		data.shaderTexture->use();
 		data.shaderTexture->setFloat("Ztrunc", data.state.trunc);
-		data.shaderTexture->setFloat("radius", data.model.radius);
 		data.shaderTexture->setFloat("transition", data.state.transitionFactor);
 		data.shaderTexture->setVec4("viewPos", data.state.camera.pos);
 		data.shaderTexture->setMat4("model", model);
+		data.shaderTexture->setMat4("invModelMat", model.inverse());
 		data.shaderTexture->setMat4("view", view);
-		data.shaderTexture->setMat4("projection", projection);
-		data.shaderTexture->setVec4("light.position", lightPos);
-		data.shaderTexture->setVec4("light.ambient", ambientColor);
-		data.shaderTexture->setVec4("light.diffuse", diffuseColor);
-		data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
-		data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
-		data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
-		data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
-		data.shaderTexture->setFloat("illum.shininess", data.noTextureNs);
-		data.shaderTexture->setBool("hasUV", data.model.hasUV);
-		
+		data.shaderTexture->setMat4("projection", projection);		
 	}
 
 	void setMeshContexteAndDraw(scopData& data)
@@ -155,7 +141,7 @@ void renderOBJ(GLFWwindow* window, scopData& data)
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	setTextureContext(data);
+	updateTextureContext(data);
 
 	data.vao.bind();
 	setMeshContexteAndDraw(data);

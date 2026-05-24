@@ -46,7 +46,7 @@ vec3 GetTriPlanarTexture(vec3 currNorm)
 {
 	vec3 blending = abs(currNorm);
 
-	float sharpness = 100.0;
+	float sharpness = 8.0;
 	blending.x = pow(blending.x, sharpness);
 	blending.y = pow(blending.y, sharpness);
 	blending.z = pow(blending.z, sharpness);

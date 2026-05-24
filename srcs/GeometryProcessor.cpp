@@ -170,6 +170,25 @@ namespace
 		for (auto& n : model.normals)
 			n = n.normalize();
 	}
+
+	void setTextureContext(scopData& data)
+	{
+		vect4f diffuseColor = vect4f(0.8f, 0.8f, 0.8f);
+		vect4f ambientColor = diffuseColor * vect4f(0.2f, 0.2f, 0.2f);
+		vect4f lightPos = data.state.camera.pos;
+		
+		data.shaderTexture->use();
+		data.shaderTexture->setFloat("radius", data.model.radius);
+		data.shaderTexture->setVec4("light.position", lightPos);
+		data.shaderTexture->setVec4("light.ambient", ambientColor);
+		data.shaderTexture->setVec4("light.diffuse", diffuseColor);
+		data.shaderTexture->setVec4("light.specular", vect4f(1.f, 1.f, 1.f));
+		data.shaderTexture->setVec4("illum.ambient", vect4f(0.2f, 0.2f, 0.2f));
+		data.shaderTexture->setVec4("illum.diffuse", vect4f(0.8f, 0.8f, 0.8f));
+		data.shaderTexture->setVec4("illum.specular", vect4f(1.f, 1.f, 1.f));
+		data.shaderTexture->setFloat("illum.shininess", data.noTextureNs);
+		data.shaderTexture->setBool("hasUV", data.model.hasUV);
+	}
 }
 
 void loadModelToGPU(scopData& data, const std::string& objPath)
@@ -179,7 +198,7 @@ void loadModelToGPU(scopData& data, const std::string& objPath)
 	if (data.model.normals.empty())
 		computeModelNormals(data.model);
 
-	float fov   = 45.f * (M_PI / 180.f);
+	float fov = 45.f * (M_PI / 180.f);
 	float distance = (data.model.radius / std::tan(fov * 0.5f)) * 1.5f;
 	data.state.camera.pos = vect4f(0.f, 0.f, distance);
 
@@ -187,13 +206,15 @@ void loadModelToGPU(scopData& data, const std::string& objPath)
 	std::vector<GLuint> indices;
 	flattenObjModel(data.model, vertices, indices, data.meshDraws);
 
-	data.vertexCount   = static_cast<int>(indices.size());
-	data.state.trunc   *= data.model.radius;
+	data.vertexCount = static_cast<int>(indices.size());
+	data.state.trunc *= data.model.radius;
 	data.state.modelRadius = data.model.radius;
 
 	activateMaterial(data);
 	initializeBuffers(data, vertices, indices);
 
 	data.default_texture = std::make_unique<Texture>("assets/models/textures/vg2.bmp");
-	data.shaderTexture  = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
+	data.shaderTexture = std::make_unique<Shader>("./shaders/Texture.vs", "./shaders/Texture.fs");
+
+	setTextureContext(data);
 }
