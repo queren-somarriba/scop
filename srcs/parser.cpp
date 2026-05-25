@@ -116,7 +116,8 @@ namespace
 			ss >> current->Ns;
 		else if (current && keyword == "illum")
 			ss >> current->illum;
-		else if (current && (keyword == "map_Ka" || keyword == "map_Ks"))
+		else if (current && (keyword == "map_Ka" || keyword == "map_Ks"
+		|| keyword == "map_Kd"))
 		{
 			std::string texture_path;
 			ss >> texture_path;
