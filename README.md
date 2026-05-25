@@ -3,7 +3,7 @@
 A 3D model viewer built with OpenGL, supporting `.obj` and `.mtl` files, Phong lighting, textures, and interactive rotation.
 
 <p align="center">
-  <video src="assets/demo/scop_spider.mp4" alt="default conf">
+  <video src="https://github.com/user-attachments/assets/votre-id-video.mp4](https://github.com/queren-somarriba/scop/blob/main/assets/demo/scop_spider.mp4" width="100%" controls></video>
 </p>
 
 ## Dependencies
