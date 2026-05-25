@@ -2,9 +2,7 @@
 
 A 3D model viewer built with OpenGL, supporting `.obj` and `.mtl` files, Phong lighting, textures, and interactive rotation.
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/votre-id-video.mp4](https://github.com/queren-somarriba/scop/blob/main/assets/demo/scop_spider.mp4" width="100%" controls></video>
-</p>
+https://github.com/user-attachments/assets/8fb05f97-07eb-4662-b011-62e7bc82da0a
 
 ## Dependencies
 
@@ -75,3 +73,19 @@ make
 - Triangle and polygon faces (automatic fan triangulation)
 - Groups (`o`, `g`), materials (`usemtl`, `mtllib`)
 - MTL properties: `Ka`, `Kd`, `Ks`, `Ke`, `Ns`, `illum`, `map_Ka`, `map_Ks`, `map_Kd`
+
+  https://github.com/user-attachments/assets/c7afa5ad-39c3-4333-98ba-15a5a6076cf1
+
+
+
+https://github.com/user-attachments/assets/d848c459-fa7f-4b43-8e91-85ab90399358
+
+
+
+https://github.com/user-attachments/assets/0f6d058a-75fb-4081-8a34-14aeabeaac0e
+
+
+
+https://github.com/user-attachments/assets/b47a1292-ba81-44a4-8b3d-b945d2dc924f
+
+
