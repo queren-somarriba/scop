@@ -88,7 +88,7 @@ namespace
 					else
 						computeVertexData(model, vertices, tmp, indices, faceIndex, fv, key);
 				}
-			++faceIndex;
+				++faceIndex;
 			}
 
 		md.count = static_cast<int>(indices.size()) - md.offset;
@@ -140,6 +140,7 @@ namespace
 
 		for (auto& mesh : model.meshes)
 		{
+
 			for (auto& face : mesh.faces)
 			{
 				for (int i = 1; i < (int)face.vertices.size() - 1; i++)

@@ -25,12 +25,11 @@ struct Material
 {
 	std::string name;
 
-	vect4f Ka{0.2f, 0.2f, 0.2f};	// ambient color (light reflected in shadow)
-	vect4f Kd{0.8f, 0.8f, 0.8f};	// diffuse color (main surface color)
-	vect4f Ks{0.f, 0.f, 0.f};	// specular color (highlight color, black = no highlight)
-	vect4f Ke{0.f, 0.f, 0.f};	// emissive color (self-illumination, black = no glow)
-	float Ns = 32.f;		// specular exponent (shininess, higher = sharper highlight)
-	int illum = 2;			// illumination model (2 = Phong: ambient + diffuse + specular)
+	vect4f Ka{0.2f, 0.2f, 0.2f};
+	vect4f Kd{0.8f, 0.8f, 0.8f};
+	vect4f Ks{0.f, 0.f, 0.f};
+	float Ns = 32.f;
+	int illum = 2;
 	std::unique_ptr<Texture>	texture;
 };
 
@@ -64,7 +63,7 @@ struct ObjModel
 	std::vector<Vec2>	uvs;
 	vect4f centroid{0.0f, 0.0f, 0.0f};
 	float	radius = 1.f;
-	int		modelVertexCount;
+	int		modelVertexCount = 0;
 	bool	hasUV = 0;
 };
 

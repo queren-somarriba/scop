@@ -35,30 +35,6 @@ namespace
 		data.shaderTexture->setMat4("projection", projection);		
 	}
 
-	// void setMeshContexteAndDraw(scopData& data)
-	// {
-	// 	for (const MeshDraw& md : data.meshDraws)
-	// 	{
-	// 		auto it = data.model.materials.find(md.material_name);
-	// 		if (it != data.model.materials.end())
-	// 		{
-	// 			data.shaderTexture->setVec4("material.ambient", it->second.Ka);
-	// 			data.shaderTexture->setVec4("material.diffuse", it->second.Kd);
-	// 			data.shaderTexture->setVec4("material.specular", it->second.Ks);
-	// 			data.shaderTexture->setFloat("material.shininess", it->second.Ns);
-	// 		}
-	// 		else
-	// 		{
-	// 			data.shaderTexture->setVec4("material.ambient", vect4f(0.2f, 0.2f, 0.2f));
-	// 			data.shaderTexture->setVec4("material.diffuse", vect4f(0.8f, 0.8f, 0.8f));
-	// 			data.shaderTexture->setVec4("material.specular", vect4f(1.f, 1.f, 1.f));
-	// 			data.shaderTexture->setFloat("material.shininess", 32.f);
-
-	// 		}
-	// 		glDrawElements(GL_TRIANGLES, md.count, GL_UNSIGNED_INT, (void*)(md.offset * sizeof(GLuint)));
-	// 	}
-	// }
-
 	void setMeshContexteAndDraw(scopData& data)
 	{
 		for (const MeshDraw& md : data.meshDraws)
@@ -142,7 +118,7 @@ GLFWwindow* initWindow()
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "scop", NULL, NULL);
 	if (window == NULL)
 	{
-		std::cout << "Failed to create GLFW window" << std::endl;
+		std::cerr << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return NULL;
 	}

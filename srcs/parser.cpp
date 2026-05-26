@@ -60,7 +60,7 @@ namespace
 			tri.material_name = face.material_name;
 			tri.vertices = {
 				face.vertices[0],
-				face.vertices[i],//
+				face.vertices[i],
 				face.vertices[i + 1]
 			};
 			mesh.faces.push_back(std::move(tri));
@@ -81,7 +81,7 @@ namespace
 				if (idx < 0)
 					idx = vertexCount + idx;
 				if (slot == 0)
-					fv.pos_idx= idx;
+					fv.pos_idx = idx;
 				if (slot == 1)
 					fv.uv_idx = idx;
 				if (slot == 2)
@@ -110,8 +110,6 @@ namespace
 			ss >> current->Kd.x >> current->Kd.y >> current->Kd.z;
 		else if (current && keyword == "Ks")
 			ss >> current->Ks.x >> current->Ks.y >> current->Ks.z;
-		else if (current && keyword == "Ke")
-			ss >> current->Ke.x >> current->Ke.y >> current->Ke.z;
 		else if (current && keyword == "Ns")
 			ss >> current->Ns;
 		else if (current && keyword == "illum")
@@ -250,7 +248,6 @@ ObjModel parseOBJ(const std::string& path)
 	model.meshes.emplace_back();
 	Mesh* currentMesh = &model.meshes.back();
 	std::string currentMaterial;
-
 	std::string line;
 	while (std::getline(file, line))
 		assignOBJValue(line, model, currentMaterial, dir, currentMesh);
