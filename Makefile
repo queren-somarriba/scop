@@ -1,7 +1,7 @@
 NAME	= scop
 CC		= c++
 
-DEBUG	= 0
+DEBUG	= 1
 
 RED		= \033[1;31m
 GREEN	= \033[1;32m
@@ -10,7 +10,7 @@ ORANGE	= \033[1;33m
 RESET	= \033[0m
 
 ifeq ($(DEBUG), 1)
-	CXXFLAGS	= -Wall -Wextra -Werror -g -march=native -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer
+	CXXFLAGS	= -Wall -Wextra -Werror -g -march=native -fsanitize=address -fno-omit-frame-pointer
 	LDFLAGS		= -fsanitize=address
 else
 	CXXFLAGS	= -Wall -Wextra -Werror -O3 -march=native
@@ -47,20 +47,20 @@ all: $(NAME)
 
 $(OBJ_DIR)/%.o: $(SRCS_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@echo "$(BLUE)Compiling $<...$(RESET)"
+	@echo -e "$(BLUE)Compiling $<...$(RESET)"
 	$(CC) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(NAME): $(OBJS)
-	@echo "$(BLUE)Linking $(NAME)...$(RESET)"
+	@echo -e "$(BLUE)Linking $(NAME)...$(RESET)"
 	@$(CC) $(CXXFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS) $(GLFLAGS)
-	@echo "$(GREEN)Done! Binary $(NAME) is ready.$(RESET)"
+	@echo -e "$(GREEN)Done! Binary $(NAME) is ready.$(RESET)"
 
 clean:
-	@echo "$(ORANGE)Cleaning objects...$(RESET)"
+	@echo -e "$(ORANGE)Cleaning objects...$(RESET)"
 	rm -rf $(OBJ_DIR)
 
 fclean: clean
-	@echo "$(RED)Full cleaning $(NAME)...$(RESET)"
+	@echo -e "$(RED)Full cleaning $(NAME)...$(RESET)"
 	rm -f $(NAME)
 
 re: fclean all
