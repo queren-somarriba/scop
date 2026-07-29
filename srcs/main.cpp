@@ -15,14 +15,14 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (!isValidFile(argv[1]))
-	{
-		std::cerr << "Error: Invalid file" << std::endl;
-		return 1;
-	}
-
 	try
 	{
+		if (!isValidFile(argv[1]))
+		{
+			std::cerr << "Error: Invalid file" << std::endl;
+			return 1;
+		}
+
 		GLFWwindow* window = initWindow();
 		if (!window)
 			return 1;
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 	}
 	catch ( const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << "Error: " << e.what() << std::endl;
 	}
 
 	return 0;

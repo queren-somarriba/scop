@@ -57,7 +57,7 @@ namespace
 				data.shaderTexture->setVec4("material.ambient",   vect4f(0.2f, 0.2f, 0.2f));
 				data.shaderTexture->setVec4("material.diffuse",   vect4f(0.8f, 0.8f, 0.8f));
 				data.shaderTexture->setVec4("material.specular",  vect4f(1.f, 1.f, 1.f));
-				data.shaderTexture->setFloat("material.shininess", 32.f);
+				data.shaderTexture->setFloat("material.shininess", data.noTextureNs);
 			}
 
 			glActiveTexture(GL_TEXTURE0);
