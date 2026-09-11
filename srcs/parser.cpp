@@ -122,7 +122,7 @@ namespace
 			texture_path = "assets/models/" + texture_path;
 			current->texture = std::make_unique<Texture>(texture_path.c_str());
 		}
-		if (!(current->texture))
+		if (current && !(current->texture))
 			current->texture = std::make_unique<Texture>("./assets/models/textures/mou2.bmp");
 	}
 
