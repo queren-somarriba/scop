@@ -122,8 +122,6 @@ namespace
 			texture_path = "assets/models/" + texture_path;
 			current->texture = std::make_unique<Texture>(texture_path.c_str());
 		}
-		if (current && !(current->texture))
-			current->texture = std::make_unique<Texture>("./assets/models/textures/mou2.bmp");
 	}
 
 	void assignOBJValue(std::string& line, ObjModel& model, std::string& currentMaterial,
@@ -234,6 +232,8 @@ void parseMTL(const std::string& path,
 
 		assignMtlValue(materials, ss, current, keyword);
 	}
+	if (current && !(current->texture))
+			current->texture = std::make_unique<Texture>("./assets/models/textures/mou2.bmp");
 }
 
 ObjModel parseOBJ(const std::string& path)

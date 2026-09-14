@@ -1,7 +1,8 @@
 newmtl phong1SG
 illum 4
-Kd 0.00 0.00 0.00
-Ka 0.00 0.00 0.00
+Ka 0.2000 0.2000 0.2000
+Kd 0.8000 0.8000 0.8000
+Ks 1.0000 1.0000 1.0000
 Tf 1.00 1.00 1.00
 map_Kd rose/texture-green-paper-pattern-scratch-background-photo-hd-wallpaper.bmp
 Ni 1.00
@@ -10,8 +11,9 @@ Ns 18.00
 
 newmtl phong2SG
 illum 4
-Kd 0.00 0.00 0.00
-Ka 0.00 0.00 0.00
+Ka 0.2000 0.2000 0.2000
+Kd 0.8000 0.8000 0.8000
+Ks 1.0000 1.0000 1.0000
 Tf 1.00 1.00 1.00
 map_Kd rose/grass_texture225.bmp
 Ni 1.00
@@ -20,9 +22,12 @@ Ns 0.00
 
 newmtl phongE1SG
 illum 4
-Kd 0.00 0.00 0.00
-Ka 0.00 0.00 0.00
+Ka 0.2000 0.2000 0.2000
+Kd 0.8000 0.8000 0.8000
+Ks 1.0000 1.0000 1.0000
 Tf 1.00 1.00 1.00
 map_Kd rose/wildtextures-leather-Campo-rose.bmp
 Ni 1.00
-Ks 0.50 0.50 0.50
+Ka 0.2000 0.2000 0.2000
+Kd 0.8000 0.8000 0.8000
+Ks 1.0000 1.0000 1.0000
